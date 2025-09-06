@@ -45,9 +45,9 @@ const Hero = () => {
       {/* Fixed content container */}
       <div 
         ref={contentRef}
-        className="fixed inset-0 z-10 flex flex-col items-center justify-center text-white px-4 text-center bg-red-700"
+        className="fixed inset-0 z-10 flex flex-col items-center justify-center text-white px-4"
       >
-        <div className="max-w-md lg:max-w-xl absolute bottom-5 left-0">
+        <div className="max-w-md lg:max-w-xl absolute bottom-5 left-5">
           <h1
             className="animate-fade-in font-medium leading-tight text-xl md:text-2xl xl:text-3xl">
             The GreenGrass way is simple: integrity, insight, and value that lasts — helping you find the right rental with confidence.
