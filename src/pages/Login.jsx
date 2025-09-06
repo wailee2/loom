@@ -90,7 +90,7 @@ const Login = () => {
   };
 
   return (
-    <div className="xl:h-screen w-full flex items-center bg-white relative">
+    <div className="min-h-screen w-full flex items-center bg-white relative">
       <div
         className="absolute inset-0 bg-cover bg-center bg-[url('/loginbg.jpg')] lg:bg-none"
       >

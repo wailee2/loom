@@ -1,9 +1,9 @@
 // pages/LandlordDashboard.jsx
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import DashboardPropertyCard from '../components/DashboardPropertyCard';
-import DashboardSearch from '../components/DashboardSearch';
-import propertyData from '../data/propertyData';
+import LandlordPropertyCard from './LandlordPropertyCard';
+import DashboardSearch from '../DashboardSearch';
+import propertyData from '../../data/propertyData';
 
 const LandlordDashboard = ({ user }) => {
   const [properties, setProperties] = useState([]);
@@ -238,7 +238,7 @@ const LandlordDashboard = ({ user }) => {
             ))
           ) : filteredProperties.length > 0 ? (
             filteredProperties.map((property) => (
-              <DashboardPropertyCard
+              <LandlordPropertyCard
                 key={property.id}
                 property={property}
                 onEdit={handleEditProperty}

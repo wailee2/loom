@@ -1,8 +1,8 @@
 // pages/TenantDashboard.jsx
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import DashboardSearch from '../components/DashboardSearch';
-import propertyData from '../data/propertyData';
+import DashboardSearch from '../DashboardSearch';
+import propertyData from '../../data/propertyData';
 
 const TenantDashboard = ({ user }) => {
   const [favorites, setFavorites] = useState([]);

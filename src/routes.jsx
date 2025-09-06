@@ -11,13 +11,14 @@ import Messages from "./pages/Messages";
 import LandlordProfile from "./pages/LandlordProfile";
 import TenantProfile from "./pages/TenantProfile";
 import Dashboard from "./pages/Dashboard";
+import ListProperty from "./pages/ListProperty";
 import ProfileSettings from "./pages/ProfileSettings";
 import AddProperty from "./pages/AddProperty";
 import EditProperty from "./pages/EditProperty";
 import PaymentPage from "./pages/PaymentPage";
 import Transactions from "./pages/Transactions";
 import TransactionDetail from "./pages/TransactionDetail";
-import ListProperty from "./pages/ListProperty";
+
 
 // Authentication check functions
 const isAuthenticated = () => {

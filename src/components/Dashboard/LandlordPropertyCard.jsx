@@ -1,7 +1,7 @@
 // components/DashboardPropertyCard.jsx
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import ConfirmationModal from './ConfirmationModal';
+import ConfirmationModal from '../ConfirmationModal';
 
 const DashboardPropertyCard = ({ property, onEdit, onDelete }) => {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
