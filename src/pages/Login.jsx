@@ -90,7 +90,7 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen w-full flex items-center bg-white relative">
+    <div className="xl:h-screen w-full flex items-center bg-white relative">
       <div
         className="absolute inset-0 bg-cover bg-center bg-[url('/loginbg.jpg')] lg:bg-none"
       >
@@ -98,23 +98,19 @@ const Login = () => {
       </div>
       <div className="w-1/2 h-full hidden lg:block relative">
         <div className="absolute inset-0 bg-black/0"></div>
-      
-        <div className="w-full h-full">
-          <img
-            src={loginbg}
-            className="h-full w-full object-cover "
-            alt="login background"
-          />
-        </div>
+        <img
+          src={loginbg}
+          className="h-full w-full object-cover "
+          alt="login background"
+        />
       </div>
-      <div className="w-full lg:w-1/2 h-full flex items-center justify-center relative space-y-8">
-        <div
-          className=" p-8 my-5 rounded-lg lg:rounded-none shadow-md "
-        >
+      <div className="w-full lg:w-1/2 h-full flex items-center justify-center relative space-y-8 p-8 my-5 lg:my-0">
+        <div>
           <div>
-            <h2 className="mt-6 text-center text-3xl font-bold text-white lg:text-black">
-              Welcome Back to GreenGrass
+            <h2 className="mt-6 text-center text-3xl font-bold text-white lg:text-gray-800">
+              Welcome Back to GreenGrass!
             </h2>
+            <p className="mt-3 text-sm text-gray-400">Log-in your account</p>
           </div>
           
           {error && (
@@ -179,7 +175,7 @@ const Login = () => {
               </div>
             </div>
 
-            <div className="text-white lg:text-gray-700">
+            <div className="text-white lg:text-black">
               <label className="block text-sm font-medium  mb-2">
                 I am a:
               </label>
@@ -235,7 +231,7 @@ const Login = () => {
           </form>
 
           <div>
-            <p className="mt-4 text-center text-sm text-gray-400">
+            <p className="mt-4 text-center text-sm text-gray-400 lg:text-gray-800">
               New to GreenGrass? {" "}
               <Link
                 to="/signup"
