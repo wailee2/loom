@@ -1,13 +1,9 @@
-const properties = {
-  thisYear: 15,
-  lastYear: 10,
-  twoYearsAgo: 8,
-  soldList: [
-    { id: 1, title: "3-Bedroom Duplex", year: 2025 },
-    { id: 2, title: "Mini Flat", year: 2025 },
-    { id: 3, title: "Luxury Apartment", year: 2024 },
-    { id: 4, title: "Studio Apartment", year: 2023 },
-  ],
-};
+// data/landlord/properties.js
+const properties = [
+  { year: 2021, totalProperties: 3, color: 'green-200' },
+  { year: 2022, totalProperties: 4, color: 'green-200' },
+  { year: 2023, totalProperties: 5, color: 'green-200' },
+  { year: 2024, totalProperties: 6, color: 'green-500' }, // this year
+];
 
 export default properties;

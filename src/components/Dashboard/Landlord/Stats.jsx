@@ -1,202 +1,229 @@
-import React from "react";
-import landlordData from "../../../data/landlord/landlordData";
+// components/Stats.jsx
+import React from 'react';
+import {
+  BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell,
+} from 'recharts';
 import {
   FaDollarSign,
   FaHome,
+  FaBuilding,
   FaClipboardList,
-  FaWallet,
+  FaMoneyBillWave,
   FaTools,
   FaStar,
-  FaUsers,
-} from "react-icons/fa";
-import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  Tooltip,
-  ResponsiveContainer,
-  PieChart,
-  Pie,
-  Cell,
-} from "recharts";
+} from 'react-icons/fa';
 
-export default function Stats() {
-  const {
-    earnings,
-    occupancies,
-    properties,
-    applications,
-    rentPayments,
-    maintenanceRequests,
-    reviews,
-  } = landlordData;
+import landlordData from '../../../data/landlord/landlordData';
 
-  // ---- Aggregates ----
-  const avgRating =
-    reviews.length > 0
-      ? (
-          reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length
-        ).toFixed(1)
-      : "N/A";
+const StatCard = ({ title, value, subtext, Icon, children }) => (
+  <div className="bg-white shadow rounded-xl p-6 relative">
+    <div className="flex justify-between items-start mb-4">
+      <div>
+        <h3 className="text-gray-500 font-medium">{title}</h3>
+        <p className="text-2xl font-bold">{value}</p>
+        {subtext && <p className="text-gray-400 text-sm">{subtext}</p>}
+      </div>
+      <Icon className="text-gray-300 text-3xl" />
+    </div>
+    <div style={{ minHeight: '150px' }}>{children}</div>
+  </div>
+);
 
-  // Applications status counts
-  const applicationCounts = [
-    { name: "Approved", value: applications.filter(a => a.status === "Approved").length, color: "#3B82F6" }, // blue
-    { name: "Declined", value: applications.filter(a => a.status === "Declined").length, color: "#9333EA" }, // purple
-    { name: "Pending", value: applications.filter(a => a.status === "Pending").length, color: "#FACC15" }, // yellow
-  ];
+const Stats = () => {
+  const { earnings, occupancies, properties, applications, rentPayments, maintenanceRequests, reviews } = landlordData;
 
-  // Rent payments status counts
-  const rentCounts = [
-    { name: "Paid", value: rentPayments.filter(r => r.status === "Paid").length, color: "#14B8A6" }, // teal
-    { name: "Scheduled", value: rentPayments.filter(r => r.status === "Scheduled").length, color: "#EC4899" }, // pink
-  ];
-
-  const statsData = [
-    {
-      id: "earnings",
-      title: "Earnings",
-      value: `₦${earnings.thisMonth.toLocaleString()}`,
-      subtext: `Last month ₦${earnings.lastMonth.toLocaleString()}`,
-      icon: <FaDollarSign className="text-green-600 text-xl" />,
-      chartType: "bar",
-      chartData: earnings.monthlyTrend,
-      chartKey: "value",
-      chartColor: "#3B82F6", // blue-500
-    },
-    {
-      id: "occupancies",
-      title: "Occupancies",
-      value: `${occupancies.occupied}/${occupancies.total}`,
-      subtext: `${occupancies.vacant} vacant`,
-      icon: <FaUsers className="text-blue-600 text-xl" />,
-      chartType: "bar",
-      chartData: occupancies.trend,
-      chartKey: "occupied",
-      chartColor: "#FACC15", // yellow
-    },
-    {
-      id: "properties",
-      title: "Properties Sold",
-      value: properties.thisYear,
-      subtext: `${properties.lastYear} last year, ${properties.twoYearsAgo} two years ago`,
-      icon: <FaHome className="text-purple-600 text-xl" />,
-      chartType: "bar",
-      chartData: [
-        { year: "2023", value: properties.twoYearsAgo, fill: "#FDE68A" }, // yellow-200
-        { year: "2024", value: properties.lastYear, fill: "#FDE68A" },
-        { year: "2025", value: properties.thisYear, fill: "#CA8A04" }, // yellow-600
-      ],
-      chartKey: "value",
-    },
-    {
-      id: "applications",
-      title: "Applications",
-      value: applications.length,
-      subtext: "Status distribution",
-      icon: <FaClipboardList className="text-orange-600 text-xl" />,
-      chartType: "pie",
-      chartData: applicationCounts,
-    },
-    {
-      id: "rentPayments",
-      title: "Rent Payments",
-      value: rentPayments.length,
-      subtext: "Paid vs Scheduled",
-      icon: <FaWallet className="text-teal-600 text-xl" />,
-      chartType: "pie",
-      chartData: rentCounts,
-    },
-    {
-      id: "maintenanceRequests",
-      title: "Maintenance",
-      value: maintenanceRequests.length,
-      subtext: "Open requests",
-      icon: <FaTools className="text-red-600 text-xl" />,
-    },
-    {
-      id: "reviews",
-      title: "Reviews",
-      value: avgRating,
-      subtext: "Average rating",
-      icon: <FaStar className="text-yellow-500 text-xl" />,
-    },
-  ];
+  // Calculate average rating
+  const averageRating = (
+    reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length
+  ).toFixed(1);
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-      {statsData.map((stat) => (
-        <div
-          key={stat.id}
-          className="bg-white rounded-2xl shadow-md p-5 relative"
-        >
-          {/* Icon (top right) */}
-          <div className="absolute top-4 right-4">{stat.icon}</div>
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 p-6">
+      {/* Earnings */}
+      <StatCard
+        title="Earnings"
+        value={`$${earnings[earnings.length - 1].amount.toLocaleString()}`}
+        subtext="This year"
+        Icon={FaDollarSign}
+      >
+        <ResponsiveContainer width="100%" height={120}>
+          <BarChart data={earnings}>
+            <XAxis dataKey="year" />
+            <YAxis />
+            <Tooltip />
+            <Bar dataKey="amount">
+              {earnings.map((entry, index) => (
+                <Cell key={index} fill={entry.color === 'blue-500' ? '#3b82f6' : '#bfdbfe'} />
+              ))}
+            </Bar>
+          </BarChart>
+        </ResponsiveContainer>
+      </StatCard>
 
-          {/* Title & Value */}
-          <h3 className="text-sm text-gray-500 font-medium">{stat.title}</h3>
-          <p className="text-2xl font-bold text-gray-800">{stat.value}</p>
-          <p className="text-xs text-gray-500">{stat.subtext}</p>
+      {/* Occupancies */}
+      <StatCard
+        title="Occupancies"
+        value={`${occupancies[occupancies.length - 1].occupiedUnits}/${occupancies[occupancies.length - 1].totalUnits}`}
+        subtext="This year"
+        Icon={FaHome}
+      >
+        <ResponsiveContainer width="100%" height={120}>
+          <BarChart data={occupancies}>
+            <XAxis dataKey="year" />
+            <YAxis />
+            <Tooltip />
+            <Bar dataKey="occupiedUnits">
+              {occupancies.map((entry, index) => (
+                <Cell key={index} fill={entry.color === 'yellow-500' ? '#facc15' : '#fef08a'} />
+              ))}
+            </Bar>
+          </BarChart>
+        </ResponsiveContainer>
+      </StatCard>
 
-          {/* Charts */}
-          {stat.chartType === "bar" && (
-            <div className="h-32 mt-3">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={stat.chartData}>
-                  <XAxis dataKey="month" hide />
-                  <YAxis hide />
-                  <Tooltip />
-                  <Bar
-                    dataKey={stat.chartKey}
-                    fill={stat.chartColor || (d => d.fill)}
-                    radius={6}
-                  />
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
-          )}
+      {/* Properties */}
+      <StatCard
+        title="Properties"
+        value={properties[properties.length - 1].totalProperties}
+        subtext="This year"
+        Icon={FaBuilding}
+      >
+        <ResponsiveContainer width="100%" height={120}>
+          <BarChart data={properties}>
+            <XAxis dataKey="year" />
+            <YAxis />
+            <Tooltip />
+            <Bar dataKey="totalProperties">
+              {properties.map((entry, index) => (
+                <Cell key={index} fill={entry.color === 'green-500' ? '#22c55e' : '#bbf7d0'} />
+              ))}
+            </Bar>
+          </BarChart>
+        </ResponsiveContainer>
+      </StatCard>
 
-          {stat.chartType === "pie" && (
-            <div className="h-40 mt-3 relative">
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
-                  <Pie
-                    data={stat.chartData}
-                    dataKey="value"
-                    nameKey="name"
-                    cx="50%"
-                    cy="50%"
-                    outerRadius={60}
-                    innerRadius={30}
-                    paddingAngle={3}
-                  >
-                    {stat.chartData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={entry.color} />
-                    ))}
-                  </Pie>
-                  <Tooltip />
-                </PieChart>
-              </ResponsiveContainer>
-
-              {/* Orbiting values */}
-              <div className="absolute inset-0 flex items-center justify-center">
-                <div className="flex flex-wrap gap-2 justify-center">
-                  {stat.chartData.map((entry, i) => (
-                    <div
-                      key={i}
-                      className="w-10 h-10 rounded-full flex items-center justify-center text-xs font-bold text-white shadow"
-                      style={{ backgroundColor: entry.color }}
-                    >
-                      {entry.value}
-                    </div>
-                  ))}
-                </div>
+      {/* Applications */}
+      <StatCard
+        title="Applications"
+        value={applications.reduce((sum, a) => sum + a.count, 0)}
+        subtext="Total applications"
+        Icon={FaClipboardList}
+      >
+        <ResponsiveContainer width="100%" height={150}>
+          <PieChart>
+            <Pie
+              data={applications}
+              dataKey="count"
+              nameKey="status"
+              innerRadius={40}
+              outerRadius={60}
+              paddingAngle={5}
+            >
+              {applications.map((entry, index) => (
+                <Cell key={index} fill={entry.color} />
+              ))}
+            </Pie>
+          </PieChart>
+        </ResponsiveContainer>
+        <div className="flex justify-around mt-2">
+          {applications.map((a) => (
+            <div key={a.status} className="text-center">
+              <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center">
+                {a.count}
               </div>
+              <span className="text-xs">{a.status}</span>
             </div>
-          )}
+          ))}
         </div>
-      ))}
+      </StatCard>
+
+      {/* Rent Payments */}
+      <StatCard
+        title="Rent Payments"
+        value={rentPayments.reduce((sum, r) => sum + r.count, 0)}
+        subtext="Total payments"
+        Icon={FaMoneyBillWave}
+      >
+        <ResponsiveContainer width="100%" height={150}>
+          <PieChart>
+            <Pie
+              data={rentPayments}
+              dataKey="count"
+              nameKey="status"
+              innerRadius={40}
+              outerRadius={60}
+              paddingAngle={5}
+            >
+              {rentPayments.map((entry, index) => (
+                <Cell key={index} fill={entry.color} />
+              ))}
+            </Pie>
+          </PieChart>
+        </ResponsiveContainer>
+        <div className="flex justify-around mt-2">
+          {rentPayments.map((r) => (
+            <div key={r.status} className="text-center">
+              <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center">
+                {r.count}
+              </div>
+              <span className="text-xs">{r.status}</span>
+            </div>
+          ))}
+        </div>
+      </StatCard>
+
+      {/* Maintenance */}
+      <StatCard
+        title="Maintenance"
+        value={maintenanceRequests.reduce((sum, m) => sum + m.count, 0)}
+        subtext="Total requests"
+        Icon={FaTools}
+      >
+        <ResponsiveContainer width="100%" height={150}>
+          <PieChart>
+            <Pie
+              data={maintenanceRequests}
+              dataKey="count"
+              nameKey="status"
+              innerRadius={40}
+              outerRadius={60}
+              paddingAngle={5}
+            >
+              {maintenanceRequests.map((entry, index) => (
+                <Cell key={index} fill={entry.color} />
+              ))}
+            </Pie>
+          </PieChart>
+        </ResponsiveContainer>
+        <div className="flex justify-around mt-2">
+          {maintenanceRequests.map((m) => (
+            <div key={m.status} className="text-center">
+              <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center">
+                {m.count}
+              </div>
+              <span className="text-xs">{m.status}</span>
+            </div>
+          ))}
+        </div>
+      </StatCard>
+
+      {/* Reviews */}
+      <StatCard
+        title="Reviews"
+        value={averageRating}
+        subtext="Average rating"
+        Icon={FaStar}
+      >
+        <div className="text-gray-500 text-sm mt-2 space-y-1">
+          {reviews.map((r, i) => (
+            <p key={i}>
+              <strong>{r.reviewer}:</strong> {r.rating}⭐ - {r.comment}
+            </p>
+          ))}
+        </div>
+      </StatCard>
     </div>
   );
-}
+};
+
+export default Stats;

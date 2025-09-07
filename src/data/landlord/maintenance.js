@@ -1,7 +1,8 @@
 // data/landlord/maintenance.js
 const maintenanceRequests = [
-  { id: 1, property: "Apartment A", issue: "Plumbing Leak", status: "Pending" },
-  { id: 2, property: "Apartment B", issue: "AC Repair", status: "In Progress" },
+  { status: 'Completed', count: 12, color: 'green-400' },
+  { status: 'In Progress', count: 5, color: 'yellow-400' },
+  { status: 'Pending', count: 3, color: 'red-400' },
 ];
 
 export default maintenanceRequests;

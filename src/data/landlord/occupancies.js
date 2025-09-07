@@ -1,16 +1,9 @@
 // data/landlord/occupancies.js
-const occupancies = {
-  total: 12, // total properties/units
-  occupied: 9,
-  vacant: 3,
-  trend: [
-    { name: "Mar", occupied: 7, vacant: 5 },
-    { name: "Apr", occupied: 8, vacant: 4 },
-    { name: "May", occupied: 9, vacant: 3 },
-    { name: "Jun", occupied: 10, vacant: 2 },
-    { name: "Jul", occupied: 9, vacant: 3 },
-    { name: "Aug", occupied: 9, vacant: 3 },
-  ],
-};
+const occupancies = [
+  { year: 2021, occupiedUnits: 8, totalUnits: 10, color: 'yellow-200' },
+  { year: 2022, occupiedUnits: 9, totalUnits: 10, color: 'yellow-200' },
+  { year: 2023, occupiedUnits: 10, totalUnits: 12, color: 'yellow-200' },
+  { year: 2024, occupiedUnits: 11, totalUnits: 12, color: 'yellow-500' }, // this year
+];
 
 export default occupancies;

@@ -1,9 +1,8 @@
 // data/landlord/applications.js
 const applications = [
-  { id: 1, applicant: "Jane Doe", property: "Apartment C", status: "Pending" },
-  { id: 2, applicant: "Samuel Okoro", property: "Apartment D", status: "Approved" },
-  { id: 3, applicant: "Titi Johnson", property: "Apartment E", status: "Declined" },
-  { id: 4, applicant: "David James", property: "Apartment B", status: "Pending" },
+  { status: 'Approved', count: 25, color: 'blue-500' },
+  { status: 'Declined', count: 10, color: 'purple-500' },
+  { status: 'Pending', count: 5, color: 'yellow-400' },
 ];
 
 export default applications;
