@@ -38,7 +38,7 @@ const Stats = () => {
   ).toFixed(1);
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 p-6">
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 p-6">
       {/* Earnings */}
       <StatCard
         title="Earnings"
@@ -48,12 +48,15 @@ const Stats = () => {
       >
         <ResponsiveContainer width="100%" height={120}>
           <BarChart data={earnings}>
-            <XAxis dataKey="year" />
-            <YAxis />
+            <XAxis dataKey="year" hide />
+            <YAxis hide />
             <Tooltip />
-            <Bar dataKey="amount">
+            <Bar dataKey="amount" radius={[5, 5, 5, 5]} barSize={30}>
               {earnings.map((entry, index) => (
-                <Cell key={index} fill={entry.color === 'blue-500' ? '#3b82f6' : '#bfdbfe'} />
+                <Cell
+                  key={index}
+                  fill={entry.color === 'blue-500' ? '#3b82f6' : '#bfdbfe'}
+                />
               ))}
             </Bar>
           </BarChart>
@@ -66,13 +69,15 @@ const Stats = () => {
         value={`${occupancies[occupancies.length - 1].occupiedUnits}/${occupancies[occupancies.length - 1].totalUnits}`}
         subtext="This year"
         Icon={FaHome}
+        className="flex bg-red-800"
       >
+        <div>hey</div>
         <ResponsiveContainer width="100%" height={120}>
           <BarChart data={occupancies}>
-            <XAxis dataKey="year" />
-            <YAxis />
+            <XAxis dataKey="year" hide/>
+            <YAxis hide/>
             <Tooltip />
-            <Bar dataKey="occupiedUnits">
+            <Bar dataKey="occupiedUnits" radius={[5, 5, 5, 5]}>
               {occupancies.map((entry, index) => (
                 <Cell key={index} fill={entry.color === 'yellow-500' ? '#facc15' : '#fef08a'} />
               ))}
