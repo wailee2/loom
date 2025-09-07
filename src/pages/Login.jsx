@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import loginbg from '../assets/loginbg.jpg';
+import { loginUser } from "../api/auth"; // import API function
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -13,96 +14,68 @@ const Login = () => {
   const navigate = useNavigate();
   const { login } = useAuth();
 
-  // Mock user data 
-  const mockUsers = {
-    tenant: {
-      id: 1001,
-      name: "Tunde Adeyemi",
-      email: "tenant@example.com",
-      password: "password123", 
-      role: "tenant",
-      verified: true,
-      favorites: [1],
-      inquiries: [1]
-    },
-    landlord: {
-      id: 2001,
-      name: "Adebola Johnson",
-      email: "landlord@example.com",
-      password: "password123",
-      role: "landlord",
-      verified: true,
-      properties: [1],
-      rating: 4.5,
-      reviews: 23
-    }
-  };
-
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
     setError("");
 
-    // Simulate API call delay
-    setTimeout(() => {
-      // Check credentials against mock data
-      let user = null;
-      
-      if (role === "tenant" && email === mockUsers.tenant.email && password === mockUsers.tenant.password) {
-        user = mockUsers.tenant;
-      } else if (role === "landlord" && email === mockUsers.landlord.email && password === mockUsers.landlord.password) {
-        user = mockUsers.landlord;
-      } else {
-        setError("Invalid email or password");
-        setIsLoading(false);
-        return;
-      }
+    try {
+      // Call real API
+      const data = await loginUser(email, password);
 
-      // Store user data and update auth context
+      // Build user object
+      const user = {
+        ...data.data,
+        role,
+      };
+
+      // Save JWT token for authenticated requests
+      localStorage.setItem("token", data.data.token);
+
+      // Update auth context
       login(user);
 
-      // Redirect to verification
-      navigate('/verification');
+      // Redirect to dashboard
+      navigate("/dashboard");
+    } catch (err) {
+      setError(err.message || "Invalid email or password");
+    } finally {
       setIsLoading(false);
-    }, 1000);
+    }
   };
 
-  const handleDemoLogin = (userType) => {
+  const handleDemoLogin = async (userType) => {
     setIsLoading(true);
     setError("");
-    
-    // Simulate API call delay
-    setTimeout(() => {
-      let user = userType === "tenant" ? mockUsers.tenant : mockUsers.landlord;
-      
-      // Auto-fill the form
-      setEmail(user.email);
-      setPassword("password123");
-      setRole(user.role);
-      
-      // Store user data and update auth context
+
+    try {
+      const demoEmail = userType === "tenant" ? "tenant@example.com" : "landlord@example.com";
+      const demoPassword = "password123";
+
+      const data = await loginUser(demoEmail, demoPassword);
+
+      const user = {
+        ...data.data,
+        role: userType,
+      };
+
+      localStorage.setItem("token", data.data.token);
       login(user);
-      
-      // Redirect to dashboard
-      navigate('/dashboard');
+      navigate("/dashboard");
+    } catch (err) {
+      setError(err.message || "Demo login failed");
+    } finally {
       setIsLoading(false);
-    }, 500);
+    }
   };
 
   return (
     <div className="min-h-screen w-full flex items-center bg-white relative">
-      <div
-        className="absolute inset-0 bg-cover bg-center bg-[url('/loginbg.jpg')] lg:bg-none"
-      >
+      <div className="absolute inset-0 bg-cover bg-center bg-[url('/loginbg.jpg')] lg:bg-none">
         <div className="absolute inset-0 bg-black/90 lg:hidden"></div>
       </div>
       <div className="w-1/2 h-screen hidden lg:block relative">
-        <div className="absolute inset-0 bg-black/0"></div>
-        <img
-          src={loginbg}
-          className="h-full w-full object-cover "
-          alt="login background"
-        />
+        <img src={loginbg} className="h-full w-full object-cover" alt="login background" />
       </div>
       <div className="w-full lg:w-1/2 h-full flex items-center justify-center relative space-y-8 p-8 my-5 lg:my-0">
         <div>
@@ -112,19 +85,17 @@ const Login = () => {
             </h2>
             <p className="mt-3 text-sm text-gray-400">Log-in your account</p>
           </div>
-          
+
           {error && (
             <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative">
               {error}
             </div>
           )}
-          
+
           <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
             <div className="rounded-md shadow-sm -space-y-px">
               <div>
-                <label htmlFor="email-address" className="sr-only">
-                  Email address
-                </label>
+                <label htmlFor="email-address" className="sr-only">Email address</label>
                 <input
                   id="email-address"
                   name="email"
@@ -138,9 +109,7 @@ const Login = () => {
                 />
               </div>
               <div>
-                <label htmlFor="password" className="sr-only">
-                  Password
-                </label>
+                <label htmlFor="password" className="sr-only">Password</label>
                 <input
                   id="password"
                   name="password"
@@ -155,30 +124,18 @@ const Login = () => {
               </div>
             </div>
 
-            <div className="flex items-center justify-between ">
+            <div className="flex items-center justify-between">
               <div className="flex items-center">
-                <input
-                  id="remember-me"
-                  name="remember-me"
-                  type="checkbox"
-                  className="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300 rounded"
-                />
-                <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-300 lg:text-gray-900">
-                  Remember me
-                </label>
+                <input id="remember-me" name="remember-me" type="checkbox" className="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300 rounded" />
+                <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-300 lg:text-gray-900">Remember me</label>
               </div>
-
               <div className="text-sm">
-                <a href="#" className=" text-gray-600 hover:text-green-500">
-                  Forgot password?
-                </a>
+                <a href="#" className="text-gray-600 hover:text-green-500">Forgot password?</a>
               </div>
             </div>
 
             <div className="text-white lg:text-black">
-              <label className="block text-sm font-medium  mb-2">
-                I am a:
-              </label>
+              <label className="block text-sm font-medium mb-2">I am a:</label>
               <div className="flex space-x-4 text-white lg:text-gray-900">
                 <div className="flex items-center">
                   <input
@@ -189,9 +146,7 @@ const Login = () => {
                     checked={role === "tenant"}
                     onChange={() => setRole("tenant")}
                   />
-                  <label htmlFor="tenant-role" className="ml-2 block text-sm ">
-                    Tenant
-                  </label>
+                  <label htmlFor="tenant-role" className="ml-2 block text-sm">Tenant</label>
                 </div>
                 <div className="flex items-center">
                   <input
@@ -202,9 +157,7 @@ const Login = () => {
                     checked={role === "landlord"}
                     onChange={() => setRole("landlord")}
                   />
-                  <label htmlFor="landlord-role" className="ml-2 block text-sm ">
-                    Landlord
-                  </label>
+                  <label htmlFor="landlord-role" className="ml-2 block text-sm">Landlord</label>
                 </div>
               </div>
             </div>
@@ -223,27 +176,20 @@ const Login = () => {
                     </svg>
                     Logging in...
                   </span>
-                ) : (
-                  "Log in"
-                )}
+                ) : "Log in"}
               </button>
             </div>
           </form>
 
           <div>
             <p className="mt-4 text-center text-sm text-gray-400 lg:text-gray-800">
-              New to GreenGrass? {" "}
-              <Link
-                to="/signup"
-                className=" text-green-600 hover:text-green-500"
-              >
-                Create account
-              </Link>
+              New to GreenGrass?{" "}
+              <Link to="/signup" className="text-green-600 hover:text-green-500">Create account</Link>
             </p>
           </div>
 
           <div className="mt-6">
-            <div className="relative  ">
+            <div className="relative">
               <div className="hidden lg:block">
                 <div className="absolute inset-0 flex items-center">
                   <div className="w-full border-t border-gray-300" />
