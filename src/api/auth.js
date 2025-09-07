@@ -1,5 +1,5 @@
 // auth.js
-import apiClient from './apiclient.js';
+import apiClient from './apiClient.js';
 
 // Token management utilities
 export const tokenUtils = {
