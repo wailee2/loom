@@ -91,7 +91,7 @@ const Login = ({ onSuccess, onSwitchToRegister }) => {
             </div>
 
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700">Password</label>
+              <label htmlFor="password" className="block text-sm font-medium text-gray-700">Passwordg</label>
               <div className="mt-1 relative">
                 <input
                   id="password"
