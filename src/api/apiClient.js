@@ -58,19 +58,26 @@ class ApiClient {
 
   // Auth endpoints
   async login(credentials) {
-    return this.request('/api/accounts/login/', {
-      method: 'POST',
-      body: JSON.stringify({
-        email: credentials.email.trim(),
-        password: credentials.password.trim(),
-      }),
-      auth: false,
-    });
-  }
+  return this.request('/api/accounts/login/', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'   // <- important!
+    },
+    body: JSON.stringify({
+      email: credentials.email.trim(),
+      password: credentials.password.trim(),
+    }),
+    auth: false,
+  });
+}
+
 
   async register(userData) {
     return this.request('/api/accounts/register/', {
       method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'   // <- important!
+      },
       body: JSON.stringify(userData),
       auth: false,
     });
