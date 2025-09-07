@@ -1,129 +1,71 @@
-const BASE_URL = 'https://greengrass-backend.onrender.com';
+// src/api/apiClient.js
+const BASE_URL = "https://your-backend.com"; // change to your backend
 
-class ApiClient {
+export class ApiClient {
   constructor() {
     this.baseURL = BASE_URL;
-    this.token = this.getStoredToken();
   }
 
-  // --------------------
-  // Token Utilities
-  // --------------------
-  getStoredToken() {
-    return typeof window !== 'undefined' ? localStorage.getItem('access_token') : null;
-  }
-
-  setToken(token) {
-    if (typeof window !== 'undefined') localStorage.setItem('access_token', token);
-    this.token = token;
+  getAccessToken() {
+    return localStorage.getItem("access");
   }
 
   getRefreshToken() {
-    return typeof window !== 'undefined' ? localStorage.getItem('refresh_token') : null;
+    return localStorage.getItem("refresh");
   }
 
-  setRefreshToken(token) {
-    if (typeof window !== 'undefined') localStorage.setItem('refresh_token', token);
-  }
-
-  removeToken() {
-    if (typeof window !== 'undefined') {
-      localStorage.removeItem('access_token');
-      localStorage.removeItem('refresh_token');
-    }
-    this.token = null;
-  }
-
-  getHeaders(includeAuth = true) {
-    const headers = { 'Content-Type': 'application/json' };
-    if (includeAuth && this.token) headers['Authorization'] = `Bearer ${this.token}`;
-    return headers;
-  }
-
-  // --------------------
-  // Core request
-  // --------------------
   async request(endpoint, options = {}) {
-    const url = `${this.baseURL}${endpoint}`;
-    const config = {
-      headers: this.getHeaders(options.auth !== false),
-      ...options,
+    const headers = {
+      "Content-Type": "application/json",
+      ...options.headers,
     };
 
-    try {
-      const res = await fetch(url, config);
-      const data = await res.json();
-
-      if (!res.ok) {
-        console.error('API request failed:', res.status, data);
-        throw new Error(data.message || `HTTP ${res.status}`);
-      }
-
-      return data;
-    } catch (error) {
-      console.error('API request failed:', error);
-      throw error;
+    // Attach access token if available
+    const token = this.getAccessToken();
+    if (token) {
+      headers["Authorization"] = `Bearer ${token}`;
     }
-  }
 
-  // --------------------
-  // Auth Endpoints
-  // --------------------
-  async login(credentials) {
-    const data = await this.request('/api/accounts/login/', {
-      method: 'POST',
-      body: JSON.stringify({
-        email: credentials.email.trim(),
-        password: credentials.password.trim(),
-      }),
-      auth: false,
+    const response = await fetch(`${this.baseURL}${endpoint}`, {
+      ...options,
+      headers,
     });
 
-    // Store tokens if returned
-    if (data?.data?.access) this.setToken(data.data.access);
-    if (data?.data?.refresh) this.setRefreshToken(data.data.refresh);
+    // If token expired, try refresh
+    if (response.status === 401 && this.getRefreshToken()) {
+      const newAccess = await this.refreshToken();
+      if (newAccess) {
+        headers["Authorization"] = `Bearer ${newAccess}`;
+        return fetch(`${this.baseURL}${endpoint}`, {
+          ...options,
+          headers,
+        });
+      }
+    }
 
-    return data;
-  }
-
-  async register(userData) {
-    return this.request('/api/accounts/register/', {
-      method: 'POST',
-      body: JSON.stringify(userData),
-      auth: false,
-    });
+    return response;
   }
 
   async refreshToken() {
-    const refresh = this.getRefreshToken();
-    if (!refresh) throw new Error('No refresh token available');
+    try {
+      const response = await fetch(`${this.baseURL}/api/token/refresh/`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ refresh: this.getRefreshToken() }),
+      });
 
-    const data = await this.request('/api/token/refresh/', {
-      method: 'POST',
-      body: JSON.stringify({ refresh }),
-      auth: false,
-    });
+      if (!response.ok) throw new Error("Failed to refresh token");
 
-    if (data?.access) this.setToken(data.access);
-    return data;
-  }
-
-  async logout() {
-    this.removeToken();
-  }
-
-  // --------------------
-  // Profile
-  // --------------------
-  async getProfile() {
-    return this.request('/api/accounts/profile/');
-  }
-
-  // Example: protected endpoint
-  async getProperties() {
-    return this.request('/api/properties/');
+      const data = await response.json();
+      localStorage.setItem("access", data.access);
+      return data.access;
+    } catch (err) {
+      console.error("Refresh token failed:", err);
+      localStorage.removeItem("access");
+      localStorage.removeItem("refresh");
+      return null;
+    }
   }
 }
 
-const apiClient = new ApiClient();
-export default apiClient;
+export const apiClient = new ApiClient();

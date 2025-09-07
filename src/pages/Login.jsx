@@ -1,132 +1,63 @@
-import React, { useState, useEffect } from 'react';
-import { Eye, EyeOff, AlertCircle, CheckCircle, Loader2 } from 'lucide-react';
-import { useAuth } from '../context/AuthContext';
-import { validation } from '../api/auth';
+// src/pages/Login.jsx
+import React, { useState } from "react";
+import { useAuth } from "../context/AuthContext";
 
-const Login = ({ onSuccess, onSwitchToRegister }) => {
-  const { login, loginLoading, error, clearError, isAuthenticated } = useAuth();
-
-  const [formData, setFormData] = useState({ email: '', password: '' });
-  const [formErrors, setFormErrors] = useState({});
-  const [showPassword, setShowPassword] = useState(false);
-  const [successMessage, setSuccessMessage] = useState('');
-
-  useEffect(() => {
-    if (error) clearError();
-    setFormErrors({});
-    setSuccessMessage('');
-  }, [formData.email, formData.password]);
-
-  useEffect(() => {
-    if (isAuthenticated && onSuccess) onSuccess();
-  }, [isAuthenticated, onSuccess]);
-
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
-  };
+const Login = ({ onSuccess }) => {
+  const { login, loading, error } = useAuth();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setFormErrors({});
-    setSuccessMessage('');
-
-    const validation_result = validation.validateLogin(formData);
-    if (!validation_result.isValid) {
-      setFormErrors(validation_result.errors);
-      return;
-    }
-
-    const result = await login(formData);
-    if (result.success) {
-      setSuccessMessage('Login successful! Redirecting...');
-      setTimeout(() => { if (onSuccess) onSuccess(); }, 1500);
+    try {
+      await login(email, password);
+      if (onSuccess) onSuccess();
+    } catch (err) {
+      console.error("Login failed:", err);
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4">
-      <div className="max-w-md w-full space-y-8">
-        {/* Header */}
-        <div>
-          <div className="mx-auto h-12 w-12 bg-blue-600 rounded-full flex items-center justify-center">
-            <span className="text-white font-bold text-xl">H</span>
-          </div>
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-            Sign in to HOLO
-          </h2>
-        </div>
+    <div className="flex min-h-screen items-center justify-center bg-gray-50">
+      <div className="w-full max-w-md rounded-2xl bg-white p-8 shadow-lg">
+        <h1 className="mb-6 text-2xl font-bold text-center text-green-600">
+          Login
+        </h1>
 
-        {/* Success/Error Messages */}
-        {successMessage && (
-          <div className="rounded-md bg-green-50 p-4 flex items-center">
-            <CheckCircle className="h-5 w-5 text-green-400" />
-            <p className="ml-3 text-sm text-green-800">{successMessage}</p>
-          </div>
-        )}
-        {error && (
-          <div className="rounded-md bg-red-50 p-4 flex items-center">
-            <AlertCircle className="h-5 w-5 text-red-400" />
-            <p className="ml-3 text-sm text-red-800">{error}</p>
-          </div>
-        )}
-
-        {/* Form */}
-        <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
-          <div className="space-y-4">
-            <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700">Email</label>
-              <input
-                id="email"
-                name="email"
-                type="email"
-                autoComplete="email"
-                required
-                value={formData.email}
-                onChange={handleInputChange}
-                className={`mt-1 block w-full px-3 py-2 border ${formErrors.email ? 'border-red-300' : 'border-gray-300'} rounded-md focus:ring-blue-500 focus:border-blue-500 sm:text-sm`}
-                disabled={loginLoading}
-              />
-              {formErrors.email && <p className="mt-1 text-sm text-red-600">{formErrors.email}</p>}
-            </div>
-
-            <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700">Password</label>
-              <div className="mt-1 relative">
-                <input
-                  id="password"
-                  name="password"
-                  type={showPassword ? 'text' : 'password'}
-                  autoComplete="current-password"
-                  required
-                  value={formData.password}
-                  onChange={handleInputChange}
-                  className={`block w-full px-3 py-2 pr-10 border ${formErrors.password ? 'border-red-300' : 'border-gray-300'} rounded-md focus:ring-blue-500 focus:border-blue-500 sm:text-sm`}
-                  disabled={loginLoading}
-                />
-                <button type="button" className="absolute inset-y-0 right-0 pr-3 flex items-center" onClick={() => setShowPassword(!showPassword)} disabled={loginLoading}>
-                  {showPassword ? <EyeOff className="h-5 w-5 text-gray-400" /> : <Eye className="h-5 w-5 text-gray-400" />}
-                </button>
-              </div>
-              {formErrors.password && <p className="mt-1 text-sm text-red-600">{formErrors.password}</p>}
-            </div>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium">Email</label>
+            <input
+              type="email"
+              className="w-full rounded-lg border px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+            />
           </div>
 
           <div>
-            <button
-              type="submit"
-              disabled={loginLoading}
-              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-            >
-              {loginLoading ? <Loader2 className="animate-spin h-5 w-5" /> : 'Sign in'}
-            </button>
+            <label className="block text-sm font-medium">Password</label>
+            <input
+              type="password"
+              className="w-full rounded-lg border px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+            />
           </div>
 
-          <div className="text-sm text-center">
-            <button type="button" onClick={onSwitchToRegister} className="font-medium text-blue-600 hover:text-blue-500">
-              Don't have an account? Register
-            </button>
-          </div>
+          {error && (
+            <p className="text-sm text-red-500 text-center">{error}</p>
+          )}
+
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full rounded-lg bg-green-600 py-2 text-white font-semibold hover:bg-green-700 disabled:opacity-50"
+          >
+            {loading ? "Logging in..." : "Login"}
+          </button>
         </form>
       </div>
     </div>
