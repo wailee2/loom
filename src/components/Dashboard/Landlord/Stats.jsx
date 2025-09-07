@@ -69,9 +69,7 @@ const Stats = () => {
         value={`${occupancies[occupancies.length - 1].occupiedUnits}/${occupancies[occupancies.length - 1].totalUnits}`}
         subtext="This year"
         Icon={FaHome}
-        className="flex bg-red-800"
       >
-        <div>hey</div>
         <ResponsiveContainer width="100%" height={120}>
           <BarChart data={occupancies}>
             <XAxis dataKey="year" hide/>
