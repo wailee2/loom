@@ -1,129 +1,102 @@
-const BASE_URL = 'https://greengrass-backend.onrender.com';
+// src/api/apiClient.js
+import axios from "axios";
 
-class ApiClient {
-  constructor() {
-    this.baseURL = BASE_URL;
-    this.token = this.getStoredToken();
+const BASE_URL = "https://greengrass-backend.onrender.com";
+
+// Create axios instance
+const api = axios.create({
+  baseURL: BASE_URL,
+  headers: {
+    "Content-Type": "application/json",
+  },
+});
+
+// Add JWT token to headers if available
+api.interceptors.request.use((config) => {
+  const token = localStorage.getItem("access_token");
+  if (token) {
+    config.headers["Authorization"] = `Bearer ${token}`;
   }
+  return config;
+});
 
-  // --------------------
-  // Token Utilities
-  // --------------------
-  getStoredToken() {
-    return typeof window !== 'undefined' ? localStorage.getItem('access_token') : null;
-  }
+// Authentication
+export const registerUser = async (userData) => {
+  return api.post("/api/accounts/register/", userData);
+};
 
-  setToken(token) {
-    if (typeof window !== 'undefined') localStorage.setItem('access_token', token);
-    this.token = token;
-  }
+export const loginUser = async (credentials) => {
+  return api.post("/api/accounts/login/", credentials);
+};
 
-  getRefreshToken() {
-    return typeof window !== 'undefined' ? localStorage.getItem('refresh_token') : null;
-  }
+export const getToken = async (credentials) => {
+  return api.post("/api/token/", credentials);
+};
 
-  setRefreshToken(token) {
-    if (typeof window !== 'undefined') localStorage.setItem('refresh_token', token);
-  }
+// Accounts
+export const getMyProfile = async () => {
+  return api.get("/api/accounts/profile/");
+};
 
-  removeToken() {
-    if (typeof window !== 'undefined') {
-      localStorage.removeItem('access_token');
-      localStorage.removeItem('refresh_token');
-    }
-    this.token = null;
-  }
+export const getUserProfile = async (username) => {
+  return api.get(`/api/accounts/profile/${username}/`);
+};
 
-  getHeaders(includeAuth = true) {
-    const headers = { 'Content-Type': 'application/json' };
-    if (includeAuth && this.token) headers['Authorization'] = `Bearer ${this.token}`;
-    return headers;
-  }
+export const getLandlords = async () => {
+  return api.get("/api/accounts/landlords/");
+};
 
-  // --------------------
-  // Core request
-  // --------------------
-  async request(endpoint, options = {}) {
-    const url = `${this.baseURL}${endpoint}`;
-    const config = {
-      headers: this.getHeaders(options.auth !== false),
-      ...options,
-    };
+// Properties
+export const listProperties = async () => {
+  return api.get("/api/rooms/properties/");
+};
 
-    try {
-      const res = await fetch(url, config);
-      const data = await res.json();
+export const createProperty = async (propertyData) => {
+  return api.post("/api/rooms/properties/", propertyData);
+};
 
-      if (!res.ok) {
-        console.error('API request failed:', res.status, data);
-        throw new Error(data.message || `HTTP ${res.status}`);
-      }
+export const getPropertyDetails = async (propertyId) => {
+  return api.get(`/api/rooms/properties/${propertyId}/`);
+};
 
-      return data;
-    } catch (error) {
-      console.error('API request failed:', error);
-      throw error;
-    }
-  }
+// Rooms
+export const listRooms = async (propertyId) => {
+  return api.get(`/api/rooms/properties/${propertyId}/`);
+};
 
-  // --------------------
-  // Auth Endpoints
-  // --------------------
-  async login(credentials) {
-    const data = await this.request('/api/accounts/login/', {
-      method: 'POST',
-      body: JSON.stringify({
-        email: credentials.email.trim(),
-        password: credentials.password.trim(),
-      }),
-      auth: false,
-    });
+export const addRoom = async (propertyId, roomData) => {
+  return api.post(`/api/rooms/properties/${propertyId}/`, roomData);
+};
 
-    // Store tokens if returned
-    if (data?.data?.access) this.setToken(data.data.access);
-    if (data?.data?.refresh) this.setRefreshToken(data.data.refresh);
+// Messaging
+export const listConversations = async () => {
+  return api.get("/api/messaging/conversations/");
+};
 
-    return data;
-  }
+export const startConversation = async (conversationData) => {
+  return api.post("/api/messaging/start-conversation/", conversationData);
+};
 
-  async register(userData) {
-    return this.request('/api/accounts/register/', {
-      method: 'POST',
-      body: JSON.stringify(userData),
-      auth: false,
-    });
-  }
+// Reviews
+export const listReviews = async (propertyId) => {
+  return api.get(`/api/rooms/properties/${propertyId}/reviews/`);
+};
 
-  async refreshToken() {
-    const refresh = this.getRefreshToken();
-    if (!refresh) throw new Error('No refresh token available');
+export const createReview = async (propertyId, reviewData) => {
+  return api.post(`/api/rooms/properties/${propertyId}/reviews/`, reviewData);
+};
 
-    const data = await this.request('/api/token/refresh/', {
-      method: 'POST',
-      body: JSON.stringify({ refresh }),
-      auth: false,
-    });
+// Favorites
+export const listFavorites = async () => {
+  return api.get("/api/rooms/favorites/");
+};
 
-    if (data?.access) this.setToken(data.access);
-    return data;
-  }
+export const addFavorite = async (propertyId) => {
+  return api.post("/api/rooms/favorites/", { property_id: propertyId });
+};
 
-  async logout() {
-    this.removeToken();
-  }
+export const removeFavorite = async (propertyId) => {
+  return api.delete(`/api/rooms/favorites/${propertyId}/`);
+};
 
-  // --------------------
-  // Profile
-  // --------------------
-  async getProfile() {
-    return this.request('/api/accounts/profile/');
-  }
-
-  // Example: protected endpoint
-  async getProperties() {
-    return this.request('/api/properties/');
-  }
-}
-
-const apiClient = new ApiClient();
-export default apiClient;
+export default api;
