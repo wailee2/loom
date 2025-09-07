@@ -13,7 +13,7 @@ const Login = ({ onSuccess, onSwitchToRegister }) => {
     password: '',
   });
   
-  // UI state
+  // UI statete
   const [showPassword, setShowPassword] = useState(false);
   const [formErrors, setFormErrors] = useState({});
   const [successMessage, setSuccessMessage] = useState('');
