@@ -14,282 +14,209 @@ import {
 } from 'react-icons/fa';
 
 import landlordData from '../../../data/landlord/landlordData';
-
-const StatCard = ({ title, value, subtext, Icon, children }) => (
-  <div className="bg-white shadow rounded-xl p-6 relative">
-    <div className="flex justify-between items-start mb-4">
-      <div>
-        <h3 className="text-gray-500 font-medium">{title}</h3>
-        <p className="text-2xl font-bold">{value}</p>
-        {subtext && <p className="text-gray-400 text-sm">{subtext}</p>}
-      </div>
-      <Icon className="text-gray-300 text-3xl" />
-    </div>
-    <div style={{ minHeight: '150px' }}>{children}</div>
-  </div>
-);
+import { ValueCard, PropertiesCard, PieCard } from './StatsCards';
 
 const Stats = () => {
-  const { earnings, occupancies, properties, applications, rentPayments, maintenanceRequests, reviews } = landlordData;
+  const {
+    earnings,
+    occupancies,
+    properties,
+    applications,
+    rentPayments,
+    maintenanceRequests,
+    reviews
+  } = landlordData;
 
-  // Calculate average rating
   const averageRating = (
     reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length
   ).toFixed(1);
 
+  const latestOccupancy = occupancies[occupancies.length - 1];
+  const latestProperties = properties[properties.length - 1];
+
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 p-6">
-      {/* Earnings */}
-      <StatCard
-        title="Earnings"
-        value={`$${earnings[earnings.length - 1].amount.toLocaleString()}`}
-        subtext="This year"
-        Icon={FaDollarSign}
+    <div className="p-6">
+      <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6'>
+        {/* Earnings */}
+        <ValueCard
+          title="Asset Value"
+          value={`$${earnings[earnings.length - 1].amount.toLocaleString()}`}
+          subtext="This year"
+          Icon={FaDollarSign}
+        >
+          <ResponsiveContainer width="100%" height={120}>
+            <BarChart data={earnings}>
+              <XAxis dataKey="year" hide />
+              <YAxis hide />
+              <Tooltip />
+              <Bar dataKey="amount" radius={[5, 5, 5, 5]} barSize={30}>
+                {earnings.map((entry, index) => (
+                  <Cell
+                    key={index}
+                    fill={entry.color === 'blue-500' ? '#3b82f6' : '#bfdbfe'}
+                  />
+                ))}
+              </Bar>
+            </BarChart>
+          </ResponsiveContainer>
+        </ValueCard>
+
+        {/* Occupancies */}
+        <ValueCard
+          title="Occupancies"
+          value={`${latestOccupancy.occupiedUnits}/${latestOccupancy.totalUnits}`}
+          subtext="This year"
+          Icon={FaHome}
+        >
+          <ResponsiveContainer width="100%" height={120}>
+            <BarChart data={occupancies}>
+              <XAxis dataKey="year" hide />
+              <YAxis hide />
+              <Tooltip />
+              <Bar dataKey="occupiedUnits" radius={[5, 5, 5, 5]}>
+                {occupancies.map((entry, index) => (
+                  <Cell
+                    key={index}
+                    fill={entry.color === 'yellow-500' ? '#facc15' : '#fef08a'}
+                  />
+                ))}
+              </Bar>
+            </BarChart>
+          </ResponsiveContainer>
+        </ValueCard>
+
+        {/* Properties */}
+        <PropertiesCard
+          title="Properties"
+          Icon={FaBuilding}
+          onYearChange={(year) => console.log('Selected year:', year)}
+        >
+          <ResponsiveContainer width="100%" height={120}>
+            <BarChart data={properties}>
+              <XAxis dataKey="year" />
+              <YAxis />
+              <Tooltip />
+              <Bar dataKey="totalProperties">
+                {properties.map((entry, index) => (
+                  <Cell
+                    key={index}
+                    fill={entry.color === 'green-500' ? '#22c55e' : '#bbf7d0'}
+                  />
+                ))}
+              </Bar>
+            </BarChart>
+          </ResponsiveContainer>
+        </PropertiesCard>
+      </div>
+      <div
+        className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4.5'
       >
-        <ResponsiveContainer width="100%" height={120}>
-          <BarChart data={earnings}>
-            <XAxis dataKey="year" hide />
-            <YAxis hide />
-            <Tooltip />
-            <Bar dataKey="amount" radius={[5, 5, 5, 5]} barSize={30}>
-              {earnings.map((entry, index) => (
-                <Cell
-                  key={index}
-                  fill={entry.color === 'blue-500' ? '#3b82f6' : '#bfdbfe'}
+        {/* Applications */}
+        <PieCard
+          title="Applications"
+          Icon={FaClipboardList}
+          chart={
+            <ResponsiveContainer width="100%" height={150}>
+              <PieChart>
+                <Pie
+                  data={applications}
+                  dataKey="count"
+                  nameKey="status"
+                  innerRadius={40}
+                  outerRadius={60}
+                  paddingAngle={5}
+                >
+                  {applications.map((entry, index) => (
+                    <Cell key={index} fill={entry.color} />
+                  ))}
+                </Pie>
+              </PieChart>
+            </ResponsiveContainer>
+          }
+          legend={applications.map(a => (
+            <div key={a.status} className="flex items-center gap-2">
+              <span className="w-3 h-3 rounded-full" style={{ background: a.color }} />
+              <span className="text-sm">{a.status}: {a.count}</span>
+            </div>
+          ))}
+        />
+
+        {/* Rent Payments */}
+        <PieCard
+          title="Rent Payments"
+          Icon={FaMoneyBillWave}
+          chart={
+            <ResponsiveContainer width="100%" height={200}>
+              <PieChart>
+                <circle
+                  cx="50%"
+                  cy="50%"
+                  r={75}
+                  stroke="#333"
+                  strokeWidth={1}
+                  fill="none"
                 />
-              ))}
-            </Bar>
-          </BarChart>
-        </ResponsiveContainer>
-      </StatCard>
-
-      {/* Occupancies */}
-      <StatCard
-        title="Occupancies"
-        value={`${occupancies[occupancies.length - 1].occupiedUnits}/${occupancies[occupancies.length - 1].totalUnits}`}
-        subtext="This year"
-        Icon={FaHome}
-      >
-        <ResponsiveContainer width="100%" height={120}>
-          <BarChart data={occupancies}>
-            <XAxis dataKey="year" hide/>
-            <YAxis hide/>
-            <Tooltip />
-            <Bar dataKey="occupiedUnits" radius={[5, 5, 5, 5]}>
-              {occupancies.map((entry, index) => (
-                <Cell key={index} fill={entry.color === 'yellow-500' ? '#facc15' : '#fef08a'} />
-              ))}
-            </Bar>
-          </BarChart>
-        </ResponsiveContainer>
-      </StatCard>
-
-      {/* Properties */}
-      <StatCard
-        title="Properties"
-        value={properties[properties.length - 1].totalProperties}
-        subtext="This year"
-        Icon={FaBuilding}
-      >
-        <ResponsiveContainer width="100%" height={120}>
-          <BarChart data={properties}>
-            <XAxis dataKey="year" />
-            <YAxis />
-            <Tooltip />
-            <Bar dataKey="totalProperties">
-              {properties.map((entry, index) => (
-                <Cell key={index} fill={entry.color === 'green-500' ? '#22c55e' : '#bbf7d0'} />
-              ))}
-            </Bar>
-          </BarChart>
-        </ResponsiveContainer>
-      </StatCard>
-
-      {/* Applications */}
-      <StatCard
-        title="Applications"
-        value={applications.reduce((sum, a) => sum + a.count, 0)}
-        subtext="Total applications"
-        Icon={FaClipboardList}
-      >
-        <ResponsiveContainer width="100%" height={150}>
-          <PieChart>
-            <Pie
-              data={applications}
-              dataKey="count"
-              nameKey="status"
-              innerRadius={40}
-              outerRadius={60}
-              paddingAngle={5}
-            >
-              {applications.map((entry, index) => (
-                <Cell key={index} fill={entry.color} />
-              ))}
-            </Pie>
-          </PieChart>
-        </ResponsiveContainer>
-        <div className="flex justify-around mt-2">
-          {applications.map((a) => (
-            <div key={a.status} className="text-center">
-              <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center">
-                {a.count}
+                <Pie
+                  data={rentPayments}
+                  dataKey="count"
+                  nameKey="status"
+                  innerRadius={40}
+                  outerRadius={70}
+                  paddingAngle={3}
+                  cornerRadius={7}
+                >
+                  {rentPayments.map((entry, index) => (
+                    <Cell key={index} fill={entry.color} />
+                  ))}
+                </Pie>
+              </PieChart>
+            </ResponsiveContainer>
+          }
+          
+          legend={rentPayments.map(r => (
+            <div key={r.status} className="flex items-start gap-2">
+              <span className="w-4 h-4 rounded-full border-black" style={{ background: r.color + 84 }} />
+              <div>
+                <div className="text-[10.5px] text-gray-500">{r.status}</div>
+                <div className="text-[14px] text-gray-800 font-bold">{r.count}</div>
               </div>
-              <span className="text-xs">{a.status}</span>
             </div>
           ))}
-        </div>
-      </StatCard>
+        />
 
-      {/* Rent Payments */}
-      <StatCard
-        title="Rent Payments"
-        value={rentPayments.reduce((sum, r) => sum + r.count, 0)}
-        subtext="Total payments"
-        Icon={FaMoneyBillWave}
-      >
-        <ResponsiveContainer width="100%" height={220}>
-  <PieChart>
-    {/* Circular outline around the pie */}
-    <circle
-      cx="50%"
-      cy="50%"
-      r={85} // outerRadius (100) + 5px gap
-      stroke="#333" // outline color (can adjust)
-      strokeWidth={1}
-      fill="none"
-    />
-
-    <Pie
-      data={rentPayments}
-      dataKey="count"
-      nameKey="status"
-      innerRadius={50}
-      outerRadius={80}
-      paddingAngle={3}
-      cornerRadius={10}
-      tabIndex={-1}
-      onClick={null}
-      label={({ cx, cy, midAngle, innerRadius, outerRadius, value, fill }) => {
-        const RADIAN = Math.PI / 180;
-
-        // Center of slice (bud)
-        const midRadius = (innerRadius + outerRadius) / 2;
-        const budX = cx + midRadius * Math.cos(-midAngle * RADIAN);
-        const budY = cy + midRadius * Math.sin(-midAngle * RADIAN);
-
-        // Outside bubble
-        const endRadius = outerRadius + 32;
-        const endX = cx + endRadius * Math.cos(-midAngle * RADIAN);
-        const endY = cy + endRadius * Math.sin(-midAngle * RADIAN);
-
-        const paleFill = fill + "33";
-
-        return (
-          <g>
-            {/* Arrow */}
-            <line
-              x1={budX}
-              y1={budY}
-              x2={endX}
-              y2={endY}
-              stroke="#fff"
-              strokeWidth={2}
-              strokeLinecap="round"
-            />
-
-            {/* Bud */}
-            <circle cx={budX} cy={budY} r={6} fill="#fff" />
-
-            {/* Bubble (pill style) */}
-<rect
-  x={endX - 20} // half of width
-  y={endY - 11} // half of height
-  width={40}    // ~px-5
-  height={22}   // ~py-2
-  rx={12}       // rounded corners
-  fill={paleFill}
-/>
-
-{/* Text inside pill */}
-<text
-  x={endX}
-  y={endY}
-  textAnchor="middle"
-  dominantBaseline="central"
-  fill="#000"
-  fontSize={10}
-  fontWeight="500"
->
-  {value}
-</text>
-
-          </g>
-        );
-      }}
-    >
-      {rentPayments.map((entry, index) => (
-        <Cell key={index} fill={entry.color} />
-      ))}
-    </Pie>
-  </PieChart>
-</ResponsiveContainer>
-
-
-
-
-
-        <div className="flex justify-around mt-2">
-          {rentPayments.map((r) => (
-            <div key={r.status} className="text-center">
-              <div
-                className="w-8 h-8 rounded-full flex items-center justify-center"
-                style={{ backgroundColor: r.color }}
-              >
-                {r.count}
-              </div>
-              <span className="text-xs">{r.status}</span>
+        {/* Maintenance */}
+        <PieCard
+          title="Maintenance"
+          Icon={FaTools}
+          chart={
+            <ResponsiveContainer width="100%" height={150}>
+              <PieChart>
+                <Pie
+                  data={maintenanceRequests}
+                  dataKey="count"
+                  nameKey="status"
+                  innerRadius={40}
+                  outerRadius={60}
+                  paddingAngle={5}
+                >
+                  {maintenanceRequests.map((entry, index) => (
+                    <Cell key={index} fill={entry.color} />
+                  ))}
+                </Pie>
+              </PieChart>
+            </ResponsiveContainer>
+          }
+          legend={maintenanceRequests.map(m => (
+            <div key={m.status} className="flex items-center gap-2">
+              <span className="w-3 h-3 rounded-full" style={{ background: m.color }} />
+              <span className="text-sm">{m.status}: {m.count}</span>
             </div>
           ))}
-        </div>
-      </StatCard>
-
-      {/* Maintenance */}
-      <StatCard
-        title="Maintenance"
-        value={maintenanceRequests.reduce((sum, m) => sum + m.count, 0)}
-        subtext="Total requests"
-        Icon={FaTools}
-      >
-        <ResponsiveContainer width="100%" height={150}>
-          <PieChart>
-            <Pie
-              data={maintenanceRequests}
-              dataKey="count"
-              nameKey="status"
-              innerRadius={40}
-              outerRadius={60}
-              paddingAngle={5}
-            >
-              {maintenanceRequests.map((entry, index) => (
-                <Cell key={index} fill={entry.color} />
-              ))}
-            </Pie>
-          </PieChart>
-        </ResponsiveContainer>
-        <div className="flex justify-around mt-2">
-          {maintenanceRequests.map((m) => (
-            <div key={m.status} className="text-center">
-              <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center">
-                {m.count}
-              </div>
-              <span className="text-xs">{m.status}</span>
-            </div>
-          ))}
-        </div>
-      </StatCard>
+        />
+      </div>
 
       {/* Reviews */}
-      <StatCard
+      <ValueCard
         title="Reviews"
         value={averageRating}
         subtext="Average rating"
@@ -302,7 +229,8 @@ const Stats = () => {
             </p>
           ))}
         </div>
-      </StatCard>
+      </ValueCard>
+
     </div>
   );
 };
