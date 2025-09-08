@@ -1,8 +1,11 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
 const Login = () => {
   const { login } = useAuth();
+  const navigate = useNavigate();
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -12,9 +15,10 @@ const Login = () => {
     e.preventDefault();
     setError("");
     setLoading(true);
+
     try {
       await login(email, password);
-      alert("Login successful!");
+      navigate("/dashboard"); // redirect after login
     } catch (err) {
       setError(err.message || "Login failed");
     } finally {
@@ -26,7 +30,7 @@ const Login = () => {
     <form onSubmit={handleSubmit}>
       <input
         type="email"
-        placeholder="Emailll"
+        placeholder="Email"
         value={email}
         onChange={(e) => setEmail(e.target.value)}
         required
