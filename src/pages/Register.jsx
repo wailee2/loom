@@ -12,9 +12,9 @@ const Register = () => {
     password2: "",
     first_name: "",
     last_name: "",
-    user_type: "landlord", // default
+    user_type: "tenant", // default
   });
-  const [error, setError] = useState("");
+  const [error, setError] = useState(null); // store detailed errors
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -25,24 +25,31 @@ const Register = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    setError("");
+    setError(null);
     setMessage("");
 
     if (form.password !== form.password2) {
-      setError("Passwords do not match");
+      setError({ password2: ["Passwords do not match"] });
       setLoading(false);
       return;
     }
 
     const result = await register(form);
+
     if (result.success) {
       console.log("Registration successful:", result.message);
       setMessage(result.message);
-      // Optionally redirect to login
       setTimeout(() => navigate("/login"), 2000);
     } else {
       console.error("Registration failed:", result.error);
-      setError(result.error);
+      
+      try {
+        // Try to parse JSON string into an object for display
+        const parsedError = JSON.parse(result.error);
+        setError(parsedError);
+      } catch {
+        setError({ non_field_errors: [result.error] });
+      }
     }
 
     setLoading(false);
@@ -51,8 +58,18 @@ const Register = () => {
   return (
     <div>
       <h1>Register</h1>
-      {error && <p style={{ color: "red" }}>{error}</p>}
+
+      {/* Display general success message */}
       {message && <p style={{ color: "green" }}>{message}</p>}
+
+      {/* Display backend validation errors */}
+      {error &&
+        Object.keys(error).map((key) => (
+          <div key={key} style={{ color: "red" }}>
+            {key}: {error[key].join(", ")}
+          </div>
+        ))}
+
       <form onSubmit={handleSubmit}>
         <input
           type="email"
