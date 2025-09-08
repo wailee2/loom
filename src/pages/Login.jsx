@@ -1,39 +1,51 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
 const Login = () => {
-  const { login } = useAuth();
+  const { user, login, loading } = useAuth();
   const navigate = useNavigate();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+
+  // Redirect if already logged in
+  useEffect(() => {
+    if (!loading && user) {
+      navigate("/dashboard", { replace: true });
+    }
+  }, [user, loading, navigate]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
-    setLoading(true);
+    setSubmitting(true);
 
     try {
       await login(email, password);
-      navigate("/dashboard"); // redirect after login
+      navigate("/dashboard", { replace: true }); // redirect after login
     } catch (err) {
       setError(err.message || "Login failed");
     } finally {
-      setLoading(false);
+      setSubmitting(false);
     }
   };
 
+  if (loading) {
+    return <p>Loading...</p>; // or a spinner
+  }
+
   return (
-    <form onSubmit={handleSubmit}>
+    <form onSubmit={handleSubmit} style={{ maxWidth: 400, margin: "2rem auto" }}>
       <input
         type="email"
-        placeholder="Emailnew routes On God"
+        placeholder="Email"
         value={email}
         onChange={(e) => setEmail(e.target.value)}
         required
+        style={{ width: "100%", padding: "0.5rem", marginBottom: "1rem" }}
       />
       <input
         type="password"
@@ -41,11 +53,24 @@ const Login = () => {
         value={password}
         onChange={(e) => setPassword(e.target.value)}
         required
+        style={{ width: "100%", padding: "0.5rem", marginBottom: "1rem" }}
       />
-      <button type="submit" disabled={loading}>
-        {loading ? "Logging in..." : "Login"}
+      <button
+        type="submit"
+        disabled={submitting}
+        style={{
+          width: "100%",
+          padding: "0.5rem",
+          backgroundColor: "#4CAF50",
+          color: "white",
+          border: "none",
+          borderRadius: 4,
+          cursor: "pointer",
+        }}
+      >
+        {submitting ? "Logging in..." : "Login"}
       </button>
-      {error && <p style={{ color: "red" }}>{error}</p>}
+      {error && <p style={{ color: "red", marginTop: "1rem" }}>{error}</p>}
     </form>
   );
 };
