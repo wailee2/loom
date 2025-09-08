@@ -147,15 +147,16 @@ const Stats = () => {
         subtext="Total payments"
         Icon={FaMoneyBillWave}
       >
-        <ResponsiveContainer width="100%" height={150}>
+        <ResponsiveContainer width="100%" height={200}>
           <PieChart>
             <Pie
               data={rentPayments}
               dataKey="count"
               nameKey="status"
-              innerRadius={40}
-              outerRadius={60}
+              innerRadius={60}
+              outerRadius={100}
               paddingAngle={5}
+              cornerRadius={10}
             >
               {rentPayments.map((entry, index) => (
                 <Cell key={index} fill={entry.color} />
