@@ -147,27 +147,104 @@ const Stats = () => {
         subtext="Total payments"
         Icon={FaMoneyBillWave}
       >
-        <ResponsiveContainer width="100%" height={200}>
-          <PieChart>
-            <Pie
-              data={rentPayments}
-              dataKey="count"
-              nameKey="status"
-              innerRadius={60}
-              outerRadius={100}
-              paddingAngle={5}
-              cornerRadius={10}
-            >
-              {rentPayments.map((entry, index) => (
-                <Cell key={index} fill={entry.color} />
-              ))}
-            </Pie>
-          </PieChart>
-        </ResponsiveContainer>
+        <ResponsiveContainer width="100%" height={220}>
+  <PieChart>
+    {/* Circular outline around the pie */}
+    <circle
+      cx="50%"
+      cy="50%"
+      r={85} // outerRadius (100) + 5px gap
+      stroke="#333" // outline color (can adjust)
+      strokeWidth={1}
+      fill="none"
+    />
+
+    <Pie
+      data={rentPayments}
+      dataKey="count"
+      nameKey="status"
+      innerRadius={50}
+      outerRadius={80}
+      paddingAngle={3}
+      cornerRadius={10}
+      tabIndex={-1}
+      onClick={null}
+      label={({ cx, cy, midAngle, innerRadius, outerRadius, value, fill }) => {
+        const RADIAN = Math.PI / 180;
+
+        // Center of slice (bud)
+        const midRadius = (innerRadius + outerRadius) / 2;
+        const budX = cx + midRadius * Math.cos(-midAngle * RADIAN);
+        const budY = cy + midRadius * Math.sin(-midAngle * RADIAN);
+
+        // Outside bubble
+        const endRadius = outerRadius + 32;
+        const endX = cx + endRadius * Math.cos(-midAngle * RADIAN);
+        const endY = cy + endRadius * Math.sin(-midAngle * RADIAN);
+
+        const paleFill = fill + "33";
+
+        return (
+          <g>
+            {/* Arrow */}
+            <line
+              x1={budX}
+              y1={budY}
+              x2={endX}
+              y2={endY}
+              stroke="#fff"
+              strokeWidth={2}
+              strokeLinecap="round"
+            />
+
+            {/* Bud */}
+            <circle cx={budX} cy={budY} r={6} fill="#fff" />
+
+            {/* Bubble (pill style) */}
+<rect
+  x={endX - 20} // half of width
+  y={endY - 11} // half of height
+  width={40}    // ~px-5
+  height={22}   // ~py-2
+  rx={12}       // rounded corners
+  fill={paleFill}
+/>
+
+{/* Text inside pill */}
+<text
+  x={endX}
+  y={endY}
+  textAnchor="middle"
+  dominantBaseline="central"
+  fill="#000"
+  fontSize={10}
+  fontWeight="500"
+>
+  {value}
+</text>
+
+          </g>
+        );
+      }}
+    >
+      {rentPayments.map((entry, index) => (
+        <Cell key={index} fill={entry.color} />
+      ))}
+    </Pie>
+  </PieChart>
+</ResponsiveContainer>
+
+
+
+
+
         <div className="flex justify-around mt-2">
           {rentPayments.map((r) => (
             <div key={r.status} className="text-center">
-              <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center">
+              <div
+                className="w-8 h-8 rounded-full flex items-center justify-center"
+                style={{ backgroundColor: r.color }}
+              >
                 {r.count}
               </div>
               <span className="text-xs">{r.status}</span>

@@ -1,1 +1,5 @@
 @import "tailwindcss";
+
+.recharts-sector:focus {
+  outline: none;
+}
