@@ -1,100 +1,135 @@
 // src/pages/Login.jsx
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import { Eye, EyeOff, Loader2 } from "lucide-react";
+import { Eye, EyeOff } from "lucide-react"; // for password toggle icon
 
-export default function Login({ onSuccess, onSwitchToRegister }) {
+const Login = () => {
   const { login } = useAuth();
+  const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError("");
     setLoading(true);
+    setError("");
 
-    try {
-      const user = await login(email, password);
-      console.log("Login success:", user);
-      if (onSuccess) onSuccess();
-    } catch (err) {
-      console.error("Login failed:", err);
-      setError("Invalid credentials");
-    } finally {
-      setLoading(false);
+    const result = await login(email, password);
+
+    if (result.success) {
+      console.log("Login successful for user:", result.user);
+      navigate("/dashboard");
+    } else {
+      console.error("Login failed:", result.error);
+
+      // More descriptive error messages
+      if (result.error === "Invalid credentials") {
+        setError("Invalid email or password. Please try again.");
+      } else if (result.error === "User not found") {
+        setError("No account found with this email.");
+      } else if (result.error === "Server error") {
+        setError("Something went wrong on our end. Please try again later.");
+      } else {
+        setError("Login failed. Please check your details and try again.");
+      }
     }
+    setLoading(false);
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-50">
-      <div className="w-full max-w-md bg-white p-6 rounded-2xl shadow-md">
-        <h2 className="text-2xl font-bold text-center mb-6">Login</h2>
+    <div className="flex min-h-screen items-center justify-center bg-gray-100 px-4">
+      <div className="w-full max-w-md rounded-2xl bg-white p-8 shadow-lg">
+        <h1 className="mb-6 text-center text-2xl font-bold text-gray-800">Login</h1>
 
         {error && (
-          <div className="mb-4 text-red-500 text-sm text-center">{error}</div>
+          <div className="mb-4 flex items-center gap-2 rounded-md bg-red-100 p-3 text-sm text-red-700">
+            ⚠️ {error}
+          </div>
         )}
 
         <form onSubmit={handleSubmit} className="space-y-4">
-          {/* Email */}
           <div>
-            <label className="block text-sm font-medium mb-1">Email</label>
+            <label className="block text-sm font-medium text-gray-700">
+              Email
+            </label>
             <input
               type="email"
-              className="w-full px-3 py-2 border rounded-lg focus:ring focus:ring-green-400 outline-none"
+              placeholder="Enter your email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
+              className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-gray-900 shadow-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-400 focus:outline-none"
             />
           </div>
 
-          {/* Password with toggle */}
           <div>
-            <label className="block text-sm font-medium mb-1">Password</label>
+            <label className="block text-sm font-medium text-gray-700">
+              Password
+            </label>
             <div className="relative">
               <input
                 type={showPassword ? "text" : "password"}
-                className="w-full px-3 py-2 border rounded-lg focus:ring focus:ring-green-400 outline-none pr-10"
+                placeholder="Enter your password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
+                className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 pr-10 text-gray-900 shadow-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-400 focus:outline-none"
               />
               <button
                 type="button"
-                className="absolute inset-y-0 right-3 flex items-center text-gray-500"
                 onClick={() => setShowPassword(!showPassword)}
+                className="absolute inset-y-0 right-3 flex items-center text-gray-500 hover:text-gray-700"
               >
                 {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
               </button>
             </div>
           </div>
 
-          {/* Submit */}
           <button
             type="submit"
             disabled={loading}
-            className="w-full flex justify-center items-center bg-green-600 text-white py-2 rounded-lg hover:bg-green-700 disabled:opacity-50"
+            className="flex w-full items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 py-2 font-semibold text-white shadow-md transition hover:bg-blue-700 disabled:opacity-50"
           >
             {loading ? (
-              <Loader2 className="w-5 h-5 animate-spin" />
+              <svg
+                className="h-5 w-5 animate-spin text-white"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+              >
+                <circle
+                  className="opacity-25"
+                  cx="12"
+                  cy="12"
+                  r="10"
+                  stroke="currentColor"
+                  strokeWidth="4"
+                ></circle>
+                <path
+                  className="opacity-75"
+                  fill="currentColor"
+                  d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+                ></path>
+              </svg>
             ) : (
               "Login"
             )}
           </button>
         </form>
 
-        <p className="text-sm text-center mt-4">
+        <p className="mt-6 text-center text-sm text-gray-600">
           Don’t have an account?{" "}
-          <button
-            onClick={onSwitchToRegister}
-            className="text-green-600 hover:underline"
-          >
+          <a href="/register" className="font-medium text-blue-600 hover:underline">
             Register
-          </button>
+          </a>
         </p>
       </div>
     </div>
   );
-}
+};
+
+export default Login;
