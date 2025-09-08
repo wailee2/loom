@@ -1,31 +1,40 @@
+// src/App.jsx
 import React from "react";
-import { useState, useEffect } from 'react';
-import { AuthProvider } from './context/AuthContext';
-import AppRoutes from "./routes";
+import { Routes, Route, Navigate } from "react-router-dom";
 import Navbar from "./components/Navbar";
-import Footer from "./components/Footer";
+import Home from "./pages/Home";
+import Dashboard from "./pages/Dashboard";
+import Login from "./pages/Login";
+import { useAuth } from "./context/AuthContext";
 
-function App() {
-  const [user, setUser] = useState(null);
+const ProtectedRoute = ({ children }) => {
+  const { user, loading } = useAuth();
 
-  // Check if user is logged in on app load
-  useEffect(() => {
-    const savedUser = localStorage.getItem('user');
-    if (savedUser) {
-      setUser(JSON.parse(savedUser));
-    }
-  }, []);
+  if (loading) return <div>Loading...</div>;
+  if (!user) return <Navigate to="/login" replace />;
+  return children;
+};
+
+const App = () => {
   return (
-    <AuthProvider>
-      <div className="min-h-screen flex flex-col">
-        <Navbar user={user} setUser={setUser} />
-        <div className="flex-1">
-          <AppRoutes />
-        </div>
-        {/*<Footer />*/}
-      </div>
-    </AuthProvider>
+    <>
+      <Navbar />
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/login" element={<Login />} />
+        <Route
+          path="/dashboard"
+          element={
+            <ProtectedRoute>
+              <Dashboard />
+            </ProtectedRoute>
+          }
+        />
+        {/* fallback */}
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+    </>
   );
-}
+};
 
 export default App;

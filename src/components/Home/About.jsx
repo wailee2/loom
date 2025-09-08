@@ -1,5 +1,5 @@
 // components/Home/About.jsx
-
+import { Link } from 'react-router-dom';
 const About = () => {
 
   return (
@@ -31,6 +31,12 @@ const About = () => {
             <h2 className="text-4xl font-bold text-gray-800 mb-6">
               Revolutionizing Real Estate in Nigeria
             </h2>
+            <Link 
+                              to="/login" 
+                              className="text-gray-700 hover:text-green-600 px-3 py-2 text-sm font-medium transition-colors"
+                            >
+                              login
+                            </Link>
             <p className="text-gray-600 mb-6 text-lg">
               We are transforming how people find, buy, and rent properties across Nigeria. 
               Our platform brings transparency, security, and convenience to the real estate market.
