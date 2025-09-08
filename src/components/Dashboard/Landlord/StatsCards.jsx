@@ -45,16 +45,23 @@ export const PropertiesCard = ({ title, Icon, children, onYearChange }) => (
 );
 
 // Pie Chart style
-export const PieCard = ({ title, Icon, chart, legend, pill }) => (
-  <div className="bg-white shadow rounded-xl px-4 py-5 relative w-full ">
+export const PieCard = ({ title, Icon, iconColor, iconbGColor, chart, legend, pill }) => (
+  <div className="bg-white shadow rounded-2xl px-4 py-5 relative w-full ">
     {/* Title + icon */}
     <div className="flex justify-between items-center mb-4">
       <h3 className="text-gray-900 font-semibold text-xl">{title}</h3>
-      <Icon className="text-green-300 text-2xl" />
+    </div>
+
+    <div className="absolute rounded-full p-2 -top-2.5 -right-2.5 bg-gray-100">
+        <div className="bg-white rounded-full p-2">
+            <div className={`${iconbGColor} rounded-full p-1.5`}>
+                <Icon className={`${iconColor} text-xl`} />
+            </div>
+        </div>
     </div>
 
     {/* Chart + legend side by side */}
-    <div className="flex gap-2 items-start flex-wrap  sm:flex-nowrap  justify-center overflow-hiddens">
+    <div className="flex gap-2 items-start flex-wrap  sm:flex-nowrap  justify-center">
       <div className="w-full md:min-w-[70%]  ">{chart}</div>
       <div className="flex flex-col gap-2 w-full md:w-[40%]">{legend}</div>
       <div className="flex flex-col gap-2 w-full md:w-[40%]">{pill}</div>

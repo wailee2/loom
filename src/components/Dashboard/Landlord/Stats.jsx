@@ -145,6 +145,8 @@ const Stats = () => {
         <PieCard
           title="Rent Payments"
           Icon={FaMoneyBillWave}
+          iconColor="text-[#14b8a6]"
+          iconbGColor="bg-[#14b8a527]"
           chart={
             <ResponsiveContainer width="100%" height={200}>
               <PieChart>
