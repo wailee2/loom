@@ -2,6 +2,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import { Eye, EyeOff } from "lucide-react";
 
 const Register = () => {
   const { register } = useAuth();
@@ -82,31 +83,49 @@ const Register = () => {
     }
 
     if (step === 4 && formData.user_type === "tenant") {
-      if (!/^\d{1,11}$/.test(formData.phone_number)) {
-        newErrors.phone_number = "Phone number must be numbers only, max 11 digits";
+      if (!formData.phone_number) {
+        newErrors.phone_number = "Phone number is required";
+      } else if (!/^\d{1,11}$/.test(formData.phone_number)) {
+        newErrors.phone_number =
+          "Phone number must be numbers only, max 11 digits";
       }
       if (!formData.tenant.date_of_birth) {
         newErrors["tenant.date_of_birth"] = "Date of birth is required";
       }
-      if (formData.tenant.bio.length > 200) {
+      if (!formData.tenant.bio) {
+        newErrors["tenant.bio"] = "Bio is required";
+      } else if (formData.tenant.bio.length > 200) {
         newErrors["tenant.bio"] = "Bio cannot exceed 200 characters";
       }
     }
 
     if (step === 4 && formData.user_type === "landlord") {
-      if (!/^\d{1,11}$/.test(formData.landlord.phone_number)) {
+      if (!formData.landlord.phone_number) {
+        newErrors["landlord.phone_number"] = "Phone number is required";
+      } else if (!/^\d{1,11}$/.test(formData.landlord.phone_number)) {
         newErrors["landlord.phone_number"] =
           "Phone number must be numbers only, max 11 digits";
       }
-      if (formData.landlord.property_name.length > 200) {
+      if (!formData.landlord.property_name) {
+        newErrors["landlord.property_name"] = "Property name is required";
+      } else if (formData.landlord.property_name.length > 200) {
         newErrors["landlord.property_name"] =
           "Property name cannot exceed 200 characters";
+      }
+      if (!formData.landlord.years_experience) {
+        newErrors["landlord.years_experience"] =
+          "Years of experience is required";
       }
       if (formData.landlord.website && !/^https?:\/\/.+/.test(formData.landlord.website)) {
         newErrors["landlord.website"] = "Enter a valid website URL";
       }
-      if (formData.landlord.bio.length > 200) {
+      if (!formData.landlord.bio) {
+        newErrors["landlord.bio"] = "Bio is required";
+      } else if (formData.landlord.bio.length > 200) {
         newErrors["landlord.bio"] = "Bio cannot exceed 200 characters";
+      }
+      if (!formData.landlord.location) {
+        newErrors["landlord.location"] = "Location is required";
       }
     }
 
@@ -236,7 +255,7 @@ const Register = () => {
                   onClick={() => setShowPassword(!showPassword)}
                   className="absolute right-2 top-2 text-gray-500"
                 >
-                  {showPassword ? "🙈" : "👁️"}
+                  {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                 </button>
               </div>
               {errors.password && (
@@ -298,7 +317,7 @@ const Register = () => {
 
               <textarea
                 name="tenant.bio"
-                placeholder="Bio (max 200 chars)"
+                placeholder="Bio (max 200 chars) *"
                 maxLength="200"
                 value={formData.tenant.bio}
                 onChange={handleChange}
@@ -327,7 +346,7 @@ const Register = () => {
               <input
                 type="text"
                 name="landlord.property_name"
-                placeholder="Property Name (max 200 chars)"
+                placeholder="Property Name (max 200 chars) *"
                 maxLength="200"
                 value={formData.landlord.property_name}
                 onChange={handleChange}
@@ -340,11 +359,14 @@ const Register = () => {
               <input
                 type="number"
                 name="landlord.years_experience"
-                placeholder="Years of Experience"
+                placeholder="Years of Experience *"
                 value={formData.landlord.years_experience}
                 onChange={handleChange}
                 className="w-full rounded-lg border px-3 py-2"
               />
+              {errors["landlord.years_experience"] && (
+                <p className="text-sm text-red-600">{errors["landlord.years_experience"]}</p>
+              )}
 
               <input
                 type="url"
@@ -360,7 +382,7 @@ const Register = () => {
 
               <textarea
                 name="landlord.bio"
-                placeholder="Bio (max 200 chars)"
+                placeholder="Bio (max 200 chars) *"
                 maxLength="200"
                 value={formData.landlord.bio}
                 onChange={handleChange}
@@ -373,27 +395,79 @@ const Register = () => {
               <input
                 type="text"
                 name="landlord.location"
-                placeholder="Location"
+                placeholder="Location *"
                 value={formData.landlord.location}
                 onChange={handleChange}
                 className="w-full rounded-lg border px-3 py-2"
               />
+              {errors["landlord.location"] && (
+                <p className="text-sm text-red-600">{errors["landlord.location"]}</p>
+              )}
             </>
           )}
 
-          {/* STEP 5: Final Submit */}
+          {/* STEP 5: Confirmation */}
           {step === 5 && (
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full rounded-lg bg-green-600 py-2 font-semibold text-white shadow-md hover:bg-green-700"
-            >
-              {loading ? (
-                <div className="h-5 w-5 animate-spin rounded-full border-2 border-white border-t-transparent mx-auto"></div>
-              ) : (
-                "Done"
-              )}
-            </button>
+            <div className="space-y-4">
+              <h2 className="text-lg font-semibold text-gray-700">
+                Confirm Your Details
+              </h2>
+              <div className="rounded-lg border p-4 text-sm space-y-2">
+                <p><strong>Name:</strong> {formData.first_name} {formData.last_name}</p>
+                <p><strong>Email:</strong> {formData.email}</p>
+                <p><strong>Role:</strong> {formData.user_type}</p>
+
+                {formData.user_type === "tenant" && (
+                  <>
+                    <p><strong>Phone:</strong> {formData.phone_number}</p>
+                    <p><strong>Date of Birth:</strong> {formData.tenant.date_of_birth}</p>
+                    <p><strong>Bio:</strong> {formData.tenant.bio}</p>
+                  </>
+                )}
+
+                {formData.user_type === "landlord" && (
+                  <>
+                    <p><strong>Phone:</strong> {formData.landlord.phone_number}</p>
+                    <p><strong>Property Name:</strong> {formData.landlord.property_name}</p>
+                    <p><strong>Years of Experience:</strong> {formData.landlord.years_experience}</p>
+                    <p><strong>Website:</strong> {formData.landlord.website || "N/A"}</p>
+                    <p><strong>Bio:</strong> {formData.landlord.bio}</p>
+                    <p><strong>Location:</strong> {formData.landlord.location}</p>
+                  </>
+                )}
+              </div>
+
+              <button
+                type="submit"
+                disabled={loading}
+                className="ml-auto flex items-center justify-center rounded-lg bg-green-600 px-4 py-2 font-semibold text-white hover:bg-green-700"
+              >
+                {loading ? (
+                  <svg
+                    className="h-5 w-5 animate-spin text-white"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle
+                      className="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                    ></circle>
+                    <path
+                      className="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+                    ></path>
+                  </svg>
+                ) : (
+                  "Done"
+                )}
+              </button>
+            </div>
           )}
         </form>
 
