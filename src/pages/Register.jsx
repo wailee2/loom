@@ -2,6 +2,9 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import { Eye, EyeOff } from "lucide-react";
+
+const steps = ["Name", "Account", "Role", "Details", "Bio"];
 
 const Register = () => {
   const { register } = useAuth();
@@ -14,7 +17,7 @@ const Register = () => {
     first_name: "",
     last_name: "",
     phone_number: "",
-    user_type: "tenant", // default
+    user_type: "tenant",
     tenant: { date_of_birth: "", bio: "" },
     landlord: {
       phone_number: "",
@@ -26,13 +29,13 @@ const Register = () => {
     },
   });
 
+  const [step, setStep] = useState(0);
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
+  const [showPassword, setShowPassword] = useState(false);
 
-  // handle general form input change
   const handleChange = (e) => {
     const { name, value } = e.target;
-
     if (name.startsWith("tenant.")) {
       const key = name.split(".")[1];
       setFormData((prev) => ({
@@ -50,7 +53,29 @@ const Register = () => {
     }
   };
 
-  // handle register submit
+  const validateStep = () => {
+    const newErrors = {};
+    if (step === 0) {
+      if (!formData.first_name) newErrors.first_name = "First name is required";
+      if (!formData.last_name) newErrors.last_name = "Last name is required";
+    }
+    if (step === 1) {
+      if (!formData.email.includes("@")) newErrors.email = "Enter a valid email";
+      if (formData.password.length < 8 || !/\d/.test(formData.password))
+        newErrors.password =
+          "Password must be at least 8 characters and alphanumeric";
+      if (formData.password !== formData.password2)
+        newErrors.password2 = "Passwords do not match";
+    }
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const nextStep = () => {
+    if (validateStep()) setStep((s) => s + 1);
+  };
+  const prevStep = () => setStep((s) => s - 1);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -68,7 +93,7 @@ const Register = () => {
     if (formData.user_type === "tenant") {
       payload.phone_number = formData.phone_number;
       payload.tenant = formData.tenant;
-    } else if (formData.user_type === "landlord") {
+    } else {
       payload.landlord = formData.landlord;
     }
 
@@ -78,27 +103,36 @@ const Register = () => {
 
       if (res.success) {
         navigate("/verify", { state: { email: formData.email } });
+      } else if (res.errors) {
+        setErrors(res.errors);
+      } else if (res.error) {
+        if (res.error.toLowerCase().includes("email"))
+          setErrors({ email: "Email already exists" });
+        else setErrors({ general: res.error });
       } else {
-        if (res.errors) {
-          setErrors(res.errors); // structured errors from backend
-        } else if (res.error) {
-          setErrors({ general: res.error });
-        } else {
-          setErrors({ general: "Registration failed. Please try again." });
-        }
+        setErrors({ general: "Registration failed. Please try again." });
       }
-    } catch (err) {
+    } catch {
       setLoading(false);
-      setErrors({ general: "An unexpected error occurred. Please try again." });
+      setErrors({ general: "Unexpected error. Please try again." });
     }
   };
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-gray-100 px-4">
-      <div className="w-full max-w-lg rounded-2xl bg-white p-8 shadow-lg">
-        <h2 className="mb-6 text-center text-2xl font-bold text-gray-800">
-          Create an Account
-        </h2>
+      <div className="w-full max-w-xl rounded-2xl bg-white p-8 shadow-lg">
+        {/* Progress bar */}
+        <div className="mb-6 flex items-center">
+          {steps.map((label, idx) => (
+            <div key={idx} className="flex-1">
+              <div
+                className={`h-2 rounded-full ${
+                  idx <= step ? "bg-green-500" : "bg-gray-200"
+                }`}
+              ></div>
+            </div>
+          ))}
+        </div>
 
         {errors.general && (
           <div className="mb-4 rounded-md bg-red-100 p-3 text-sm text-red-700">
@@ -107,104 +141,101 @@ const Register = () => {
         )}
 
         <form onSubmit={handleSubmit} className="space-y-4">
-          {/* Basic Info */}
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-            <div>
+          {/* Step 0: Name */}
+          {step === 0 && (
+            <div className="space-y-4">
               <input
                 type="text"
                 name="first_name"
                 placeholder="First Name"
                 value={formData.first_name}
                 onChange={handleChange}
-                required
-                className="w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm focus:border-green-500 focus:ring-2 focus:ring-green-400 focus:outline-none"
+                className="w-full rounded-lg border px-3 py-2"
               />
               {errors.first_name && (
-                <p className="text-sm text-red-600">{errors.first_name[0]}</p>
+                <p className="text-sm text-red-600">{errors.first_name}</p>
               )}
-            </div>
-
-            <div>
               <input
                 type="text"
                 name="last_name"
                 placeholder="Last Name"
                 value={formData.last_name}
                 onChange={handleChange}
-                required
-                className="w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm focus:border-green-500 focus:ring-2 focus:ring-green-400 focus:outline-none"
+                className="w-full rounded-lg border px-3 py-2"
               />
               {errors.last_name && (
-                <p className="text-sm text-red-600">{errors.last_name[0]}</p>
+                <p className="text-sm text-red-600">{errors.last_name}</p>
               )}
             </div>
-          </div>
+          )}
 
-          <div>
-            <input
-              type="email"
-              name="email"
-              placeholder="Email Address"
-              value={formData.email}
-              onChange={handleChange}
-              required
-              className="w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm focus:border-green-500 focus:ring-2 focus:ring-green-400 focus:outline-none"
-            />
-            {errors.email && (
-              <p className="text-sm text-red-600">{errors.email[0]}</p>
-            )}
-          </div>
-
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-            <div>
+          {/* Step 1: Account */}
+          {step === 1 && (
+            <div className="space-y-4">
               <input
-                type="password"
-                name="password"
-                placeholder="Password"
-                value={formData.password}
+                type="email"
+                name="email"
+                placeholder="Email"
+                value={formData.email}
                 onChange={handleChange}
-                required
-                className="w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm focus:border-green-500 focus:ring-2 focus:ring-green-400 focus:outline-none"
+                className="w-full rounded-lg border px-3 py-2"
               />
-              {errors.password && (
-                <p className="text-sm text-red-600">{errors.password[0]}</p>
+              {errors.email && (
+                <p className="text-sm text-red-600">{errors.email}</p>
               )}
-            </div>
 
-            <div>
+              <div className="relative">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  name="password"
+                  placeholder="Password"
+                  value={formData.password}
+                  onChange={handleChange}
+                  className="w-full rounded-lg border px-3 py-2 pr-10"
+                />
+                <button
+                  type="button"
+                  className="absolute inset-y-0 right-3 flex items-center text-gray-500"
+                  onClick={() => setShowPassword(!showPassword)}
+                >
+                  {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                </button>
+              </div>
+              {errors.password && (
+                <p className="text-sm text-red-600">{errors.password}</p>
+              )}
+
               <input
                 type="password"
                 name="password2"
                 placeholder="Confirm Password"
                 value={formData.password2}
                 onChange={handleChange}
-                required
-                className="w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm focus:border-green-500 focus:ring-2 focus:ring-green-400 focus:outline-none"
+                className="w-full rounded-lg border px-3 py-2"
               />
               {errors.password2 && (
-                <p className="text-sm text-red-600">{errors.password2[0]}</p>
+                <p className="text-sm text-red-600">{errors.password2}</p>
               )}
             </div>
-          </div>
+          )}
 
-          {/* Select user type */}
-          <div>
-            <select
-              name="user_type"
-              value={formData.user_type}
-              onChange={handleChange}
-              className="w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm focus:border-green-500 focus:ring-2 focus:ring-green-400 focus:outline-none"
-            >
-              <option value="tenant">Tenant</option>
-              <option value="landlord">Landlord</option>
-            </select>
-            {errors.user_type && (
-              <p className="text-sm text-red-600">{errors.user_type[0]}</p>
-            )}
-          </div>
+          {/* Step 2: Role */}
+          {step === 2 && (
+            <div>
+              <select
+                name="user_type"
+                value={formData.user_type}
+                onChange={handleChange}
+                className="w-full rounded-lg border px-3 py-2"
+              >
+                <option value="tenant">Tenant</option>
+                <option value="landlord">Landlord</option>
+              </select>
+            </div>
+          )}
 
-          {/* Tenant Fields */}
-          {formData.user_type === "tenant" && (
+          {/* Step 3: Role-specific details */}
+          {step === 3 && formData.user_type === "tenant" && (
             <div className="space-y-4">
               <input
                 type="text"
@@ -212,44 +243,19 @@ const Register = () => {
                 placeholder="Phone Number"
                 value={formData.phone_number}
                 onChange={handleChange}
-                required
-                className="w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm focus:border-green-500 focus:ring-2 focus:ring-green-400 focus:outline-none"
+                className="w-full rounded-lg border px-3 py-2"
               />
-              {errors.phone_number && (
-                <p className="text-sm text-red-600">{errors.phone_number[0]}</p>
-              )}
-
               <input
                 type="date"
                 name="tenant.date_of_birth"
                 value={formData.tenant.date_of_birth}
                 onChange={handleChange}
-                required
-                className="w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm focus:border-green-500 focus:ring-2 focus:ring-green-400 focus:outline-none"
+                className="w-full rounded-lg border px-3 py-2"
               />
-              {errors["tenant.date_of_birth"] && (
-                <p className="text-sm text-red-600">
-                  {errors["tenant.date_of_birth"][0]}
-                </p>
-              )}
-
-              <textarea
-                name="tenant.bio"
-                placeholder="Bio"
-                value={formData.tenant.bio}
-                onChange={handleChange}
-                className="w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm focus:border-green-500 focus:ring-2 focus:ring-green-400 focus:outline-none"
-              />
-              {errors["tenant.bio"] && (
-                <p className="text-sm text-red-600">
-                  {errors["tenant.bio"][0]}
-                </p>
-              )}
             </div>
           )}
 
-          {/* Landlord Fields */}
-          {formData.user_type === "landlord" && (
+          {step === 3 && formData.user_type === "landlord" && (
             <div className="space-y-4">
               <input
                 type="text"
@@ -257,124 +263,98 @@ const Register = () => {
                 placeholder="Phone Number"
                 value={formData.landlord.phone_number}
                 onChange={handleChange}
-                required
-                className="w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm focus:border-green-500 focus:ring-2 focus:ring-green-400 focus:outline-none"
+                className="w-full rounded-lg border px-3 py-2"
               />
-              {errors["landlord.phone_number"] && (
-                <p className="text-sm text-red-600">
-                  {errors["landlord.phone_number"][0]}
-                </p>
-              )}
-
               <input
                 type="text"
                 name="landlord.property_name"
                 placeholder="Property Name"
                 value={formData.landlord.property_name}
                 onChange={handleChange}
-                className="w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm focus:border-green-500 focus:ring-2 focus:ring-green-400 focus:outline-none"
+                className="w-full rounded-lg border px-3 py-2"
               />
-              {errors["landlord.property_name"] && (
-                <p className="text-sm text-red-600">
-                  {errors["landlord.property_name"][0]}
-                </p>
-              )}
-
               <input
                 type="number"
                 name="landlord.years_experience"
-                placeholder="Years of Experience"
+                placeholder="Years Experience"
                 value={formData.landlord.years_experience}
                 onChange={handleChange}
-                className="w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm focus:border-green-500 focus:ring-2 focus:ring-green-400 focus:outline-none"
+                className="w-full rounded-lg border px-3 py-2"
               />
-              {errors["landlord.years_experience"] && (
-                <p className="text-sm text-red-600">
-                  {errors["landlord.years_experience"][0]}
-                </p>
-              )}
-
-              <input
-                type="url"
-                name="landlord.website"
-                placeholder="Website"
-                value={formData.landlord.website}
-                onChange={handleChange}
-                className="w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm focus:border-green-500 focus:ring-2 focus:ring-green-400 focus:outline-none"
-              />
-              {errors["landlord.website"] && (
-                <p className="text-sm text-red-600">
-                  {errors["landlord.website"][0]}
-                </p>
-              )}
-
-              <textarea
-                name="landlord.bio"
-                placeholder="Bio"
-                value={formData.landlord.bio}
-                onChange={handleChange}
-                className="w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm focus:border-green-500 focus:ring-2 focus:ring-green-400 focus:outline-none"
-              />
-              {errors["landlord.bio"] && (
-                <p className="text-sm text-red-600">
-                  {errors["landlord.bio"][0]}
-                </p>
-              )}
-
-              <input
-                type="text"
-                name="landlord.location"
-                placeholder="Location"
-                value={formData.landlord.location}
-                onChange={handleChange}
-                className="w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm focus:border-green-500 focus:ring-2 focus:ring-green-400 focus:outline-none"
-              />
-              {errors["landlord.location"] && (
-                <p className="text-sm text-red-600">
-                  {errors["landlord.location"][0]}
-                </p>
-              )}
             </div>
           )}
 
-          <button
-            type="submit"
-            disabled={loading}
-            className="flex w-full items-center justify-center gap-2 rounded-lg bg-green-600 px-4 py-2 font-semibold text-white shadow-md transition hover:bg-green-700 disabled:opacity-50"
-          >
-            {loading ? (
-              <svg
-                className="h-5 w-5 animate-spin text-white"
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-              >
-                <circle
-                  className="opacity-25"
-                  cx="12"
-                  cy="12"
-                  r="10"
-                  stroke="currentColor"
-                  strokeWidth="4"
-                ></circle>
-                <path
-                  className="opacity-75"
-                  fill="currentColor"
-                  d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
-                ></path>
-              </svg>
-            ) : (
-              "Register"
-            )}
-          </button>
-        </form>
+          {/* Step 4: Bio */}
+          {step === 4 && (
+            <textarea
+              name={
+                formData.user_type === "tenant" ? "tenant.bio" : "landlord.bio"
+              }
+              placeholder="Tell us about yourself..."
+              value={
+                formData.user_type === "tenant"
+                  ? formData.tenant.bio
+                  : formData.landlord.bio
+              }
+              onChange={handleChange}
+              className="w-full rounded-lg border px-3 py-2"
+            />
+          )}
 
-        <p className="mt-6 text-center text-sm text-gray-600">
-          Already have an account?{" "}
-          <a href="/login" className="font-medium text-green-600 hover:underline">
-            Login
-          </a>
-        </p>
+          {/* Navigation buttons */}
+          <div className="flex justify-between pt-4">
+            {step > 0 && (
+              <button
+                type="button"
+                onClick={prevStep}
+                className="rounded-lg border px-4 py-2 text-gray-600 hover:bg-gray-100"
+              >
+                Back
+              </button>
+            )}
+            {step < steps.length - 1 && (
+              <button
+                type="button"
+                onClick={nextStep}
+                className="rounded-lg bg-green-600 px-4 py-2 text-white hover:bg-green-700"
+              >
+                Next
+              </button>
+            )}
+            {step === steps.length - 1 && (
+              <button
+                type="submit"
+                disabled={loading}
+                className="flex items-center justify-center rounded-lg bg-green-600 px-4 py-2 text-white hover:bg-green-700 disabled:opacity-50"
+              >
+                {loading ? (
+                  <svg
+                    className="h-5 w-5 animate-spin text-white"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle
+                      className="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                    ></circle>
+                    <path
+                      className="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+                    ></path>
+                  </svg>
+                ) : (
+                  "Register"
+                )}
+              </button>
+            )}
+          </div>
+        </form>
       </div>
     </div>
   );
