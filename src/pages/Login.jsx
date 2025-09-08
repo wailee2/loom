@@ -11,7 +11,7 @@ const Login = () => {
   const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
-  // Redirect if already logged in
+  // Auto redirect if already logged in
   useEffect(() => {
     if (!loading && user) {
       navigate("/dashboard", { replace: true });
@@ -27,21 +27,19 @@ const Login = () => {
       await login(email, password);
       navigate("/dashboard", { replace: true }); // redirect after login
     } catch (err) {
-      setError(err.message || "Login failed");
+      setError(err.message);
     } finally {
       setSubmitting(false);
     }
   };
 
-  if (loading) {
-    return <p>Loading...</p>; // or a spinner
-  }
+  if (loading) return <p>Loading...</p>;
 
   return (
     <form onSubmit={handleSubmit} style={{ maxWidth: 400, margin: "2rem auto" }}>
       <input
         type="email"
-        placeholder="Email"
+        placeholder="Emailo"
         value={email}
         onChange={(e) => setEmail(e.target.value)}
         required
