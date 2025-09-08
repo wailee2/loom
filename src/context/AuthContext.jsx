@@ -1,37 +1,49 @@
-// src/context/AuthContext.jsx
-import React, { createContext, useContext, useState, useEffect } from "react";
-import { login as loginService, logout as logoutService } from "../api/auth";
+import { createContext, useContext, useState, useEffect } from "react";
+import { loginUser, logoutUser } from "./auth";
 
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(() =>
-    localStorage.getItem("user") ? JSON.parse(localStorage.getItem("user")) : null
-  );
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    // On app load, try fetching profile if token exists
+    const fetchUser = async () => {
+      const token = localStorage.getItem("access_token");
+      if (token) {
+        try {
+          const profileRes = await fetch(
+            "https://greengrass-backend.onrender.com/api/accounts/profile/",
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            }
+          );
+          const data = await profileRes.json();
+          setUser(data.data || null);
+        } catch {
+          setUser(null);
+        }
+      }
+      setLoading(false);
+    };
+    fetchUser();
+  }, []);
 
   const login = async (email, password) => {
-    setLoading(true);
-    setError(null);
-    try {
-      const data = await loginService(email, password);
-      setUser(data.user);
-    } catch (err) {
-      setError(err.message);
-      throw err;
-    } finally {
-      setLoading(false);
-    }
+    const userData = await loginUser(email, password);
+    setUser(userData);
   };
 
   const logout = () => {
-    logoutService();
+    logoutUser();
     setUser(null);
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, logout, loading, error }}>
+    <AuthContext.Provider value={{ user, login, logout, loading }}>
       {children}
     </AuthContext.Provider>
   );

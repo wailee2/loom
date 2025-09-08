@@ -1,27 +1,23 @@
-// src/api/auth.js
-import { apiClient } from "./apiClient";
+import apiClient from "./apiClient";
 
-export async function login(email, password) {
-  const response = await apiClient.request("/api/accounts/login/", {
-    method: "POST",
-    body: JSON.stringify({ email, password }),
-  });
+export const loginUser = async (email, password) => {
+  try {
+    // Get JWT token
+    const response = await apiClient.post("/api/token/", { email, password });
+    const { access, refresh } = response.data;
 
-  const data = await response.json();
+    localStorage.setItem("access_token", access);
+    localStorage.setItem("refresh_token", refresh);
 
-  if (!response.ok) {
-    throw new Error(data.error || "Login failed");
+    // Fetch user profile
+    const profileRes = await apiClient.get("/api/accounts/profile/");
+    return profileRes.data.data; // user object
+  } catch (error) {
+    throw error.response?.data || { message: "Login failed" };
   }
+};
 
-  localStorage.setItem("access", data.access);
-  localStorage.setItem("refresh", data.refresh);
-  localStorage.setItem("user", JSON.stringify(data.user));
-
-  return data;
-}
-
-export function logout() {
-  localStorage.removeItem("access");
-  localStorage.removeItem("refresh");
-  localStorage.removeItem("user");
-}
+export const logoutUser = () => {
+  localStorage.removeItem("access_token");
+  localStorage.removeItem("refresh_token");
+};
