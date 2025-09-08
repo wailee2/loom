@@ -476,7 +476,7 @@ const Register = () => {
           {step > 1 && step < 5 && (
             <button
               onClick={handleBack}
-              className="rounded-lg bg-gray-200 px-4 py-2 text-sm font-medium text-gray-700"
+              className="rounded-lg bg-pink-900 px-4 py-2 text-sm font-medium text-gray-700"
             >
               Back
             </button>
