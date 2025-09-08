@@ -14,9 +14,11 @@ export const ValueCard = ({ title, value, subtext, Icon, children }) => (
     </div>
 
     {/* Bottom row: subtext left, chart right */}
-    <div className="flex justify-between items-start gap-4 flex-wrap">
-      {subtext && <p className="text-gray-400 text-sm">{subtext}</p>}
-      <div className="w-full">{children}</div>
+    <div className="flex justify-between items-end gap-4 ">
+        <div className="w-1/3">
+            {subtext && <p className="text-gray-400 text-sm w-full">{subtext}</p>}
+        </div>
+        <div className="w-full">{children}</div>
     </div>
   </div>
 );
@@ -46,7 +48,7 @@ export const PropertiesCard = ({ title, Icon, children, onYearChange }) => (
 
 // Pie Chart style
 export const PieCard = ({ title, Icon, iconColor, iconbGColor, chart, legend, pill }) => (
-  <div className="bg-white shadow rounded-2xl px-4 py-5 relative w-full ">
+  <div className="bg-white shadow rounded-2xl px-4 py-5 relative w-full">
     {/* Title + icon */}
     <div className="flex justify-between items-center mb-4">
       <h3 className="text-gray-900 font-semibold text-xl">{title}</h3>
@@ -59,11 +61,10 @@ export const PieCard = ({ title, Icon, iconColor, iconbGColor, chart, legend, pi
             </div>
         </div>
     </div>
-
     {/* Chart + legend side by side */}
-    <div className="flex gap-2 items-start flex-wrap  sm:flex-nowrap  justify-center">
-      <div className="w-full md:min-w-[70%]  ">{chart}</div>
-      <div className="flex flex-col gap-2 w-full md:w-[40%]">{legend}</div>
+    <div className="flex space-y-5 md:gap-2 items-start flex-wrap  sm:flex-nowrap  justify-center">
+      <div className="w-full md:min-w-[70%]">{chart}</div>
+      <div className="flex flex-wrap justify-around  md:flex-col gap-2 w-full md:w-[40%]">{legend}</div>
       <div className="flex flex-col gap-2 w-full md:w-[40%]">{pill}</div>
     </div>
   </div>
