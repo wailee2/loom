@@ -161,7 +161,7 @@ const Register = () => {
             <option value="landlord">Landlord</option>
           </select>
 
-          {/* Tenant Fields */}
+          {/* Tenant Fields  */}
           {formData.user_type === "tenant" && (
             <>
               <input
