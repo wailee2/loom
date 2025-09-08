@@ -1,11 +1,11 @@
 // pages/LandlordDashboard.jsx
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import LandlordPropertyCard from "../LandlordPropertyCard";
-import DashboardSearch from "../../DashboardSearch";
-import Stats from "./Stats";
+import LandlordPropertyCard from "../../LandlordPropertyCard";
+import DashboardSearch from "../../../DashboardSearch";
+import Stats from "../Stats";
 import { FaHome, FaCheckCircle, FaEye, FaStar } from "react-icons/fa";
-import landlordData from "../../../data/landlord/landlordData";
+import landlordData from "../../../../data/landlord/landlordData";
 
 const LandlordDashboard = ({ user }) => {
   const [properties, setProperties] = useState([]);

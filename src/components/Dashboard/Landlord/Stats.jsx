@@ -44,12 +44,12 @@ const Stats = () => {
           subtext="This year"
           Icon={FaDollarSign}
         >
-          <ResponsiveContainer width="100%" height={120}>
+          <ResponsiveContainer width="100%" height={90}>
             <BarChart data={earnings}>
               <XAxis dataKey="year" hide />
               <YAxis hide />
               <Tooltip />
-              <Bar dataKey="amount" radius={[5, 5, 5, 5]} barSize={30}>
+              <Bar dataKey="amount" radius={[5, 5, 5, 5]} >
                 {earnings.map((entry, index) => (
                   <Cell
                     key={index}
@@ -67,13 +67,15 @@ const Stats = () => {
           value={`${latestOccupancy.occupiedUnits}/${latestOccupancy.totalUnits}`}
           subtext="This year"
           Icon={FaHome}
+          iconColor="text-[#FACC15]"
+          iconbGColor="bg-[#facc1542]"
         >
-          <ResponsiveContainer width="100%" height={120}>
+          <ResponsiveContainer width="100%" height={90}>
             <BarChart data={occupancies}>
               <XAxis dataKey="year" hide />
               <YAxis hide />
               <Tooltip />
-              <Bar dataKey="occupiedUnits" radius={[5, 5, 5, 5]}>
+              <Bar dataKey="occupiedUnits" radius={[5, 5, 5, 5]} barSize={50}>
                 {occupancies.map((entry, index) => (
                   <Cell
                     key={index}

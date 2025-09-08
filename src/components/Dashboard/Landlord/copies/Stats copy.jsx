@@ -13,7 +13,7 @@ import {
   FaStar,
 } from 'react-icons/fa';
 
-import landlordData from '../../../data/landlord/landlordData';
+import landlordData from '../../../../data/landlord/landlordData';
 
 const StatCard = ({ title, value, subtext, Icon, children }) => (
   <div className="bg-white shadow rounded-xl p-6 relative">
