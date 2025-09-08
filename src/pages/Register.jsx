@@ -2,23 +2,10 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import { Eye, EyeOff } from "lucide-react";
-
-const steps = [
-  "Name",
-  "Account",
-  "Role",
-  "Details",
-  "Bio",
-];
 
 const Register = () => {
   const { register } = useAuth();
   const navigate = useNavigate();
-
-  const [step, setStep] = useState(0);
-  const [showPassword, setShowPassword] = useState(false);
-  const [showPassword2, setShowPassword2] = useState(false);
 
   const [formData, setFormData] = useState({
     email: "",
@@ -27,7 +14,7 @@ const Register = () => {
     first_name: "",
     last_name: "",
     phone_number: "",
-    user_type: "tenant",
+    user_type: "tenant", // default
     tenant: { date_of_birth: "", bio: "" },
     landlord: {
       phone_number: "",
@@ -39,11 +26,15 @@ const Register = () => {
     },
   });
 
-  const [loading, setLoading] = useState(false);
+  const [step, setStep] = useState(1);
   const [errors, setErrors] = useState({});
+  const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
+  // handle input
   const handleChange = (e) => {
     const { name, value } = e.target;
+
     if (name.startsWith("tenant.")) {
       const key = name.split(".")[1];
       setFormData((prev) => ({
@@ -61,36 +52,86 @@ const Register = () => {
     }
   };
 
-  // frontend validations
+  // step validation
   const validateStep = () => {
-    const newErrors = {};
+    let newErrors = {};
 
     if (step === 1) {
-      if (!formData.email.includes("@")) newErrors.email = "Invalid email.";
-      if (formData.password.length < 8)
-        newErrors.password = "Password must be at least 8 characters.";
-      if (!/[0-9]/.test(formData.password))
-        newErrors.password = "Password must contain at least one number.";
-      if (!/[a-zA-Z]/.test(formData.password))
-        newErrors.password = "Password must contain at least one alphabet.";
-      if (formData.password !== formData.password2)
-        newErrors.password2 = "Passwords do not match.";
+      if (!formData.first_name) newErrors.first_name = "First name is required";
+      if (!formData.last_name) newErrors.last_name = "Last name is required";
+    }
+
+    if (step === 2) {
+      if (!formData.email) newErrors.email = "Email is required";
+      if (!formData.password) {
+        newErrors.password = "Password is required";
+      } else {
+        if (formData.password.length < 8) {
+          newErrors.password = "Password must be at least 8 characters";
+        }
+        if (!/[0-9]/.test(formData.password)) {
+          newErrors.password = "Password must contain at least one number";
+        }
+        if (!/[A-Za-z]/.test(formData.password)) {
+          newErrors.password = "Password must contain at least one letter";
+        }
+      }
+      if (formData.password2 !== formData.password) {
+        newErrors.password2 = "Passwords do not match";
+      }
+    }
+
+    if (step === 4 && formData.user_type === "tenant") {
+      if (!/^\d{1,11}$/.test(formData.phone_number)) {
+        newErrors.phone_number = "Phone number must be numbers only, max 11 digits";
+      }
+      if (!formData.tenant.date_of_birth) {
+        newErrors["tenant.date_of_birth"] = "Date of birth is required";
+      }
+      if (formData.tenant.bio.length > 200) {
+        newErrors["tenant.bio"] = "Bio cannot exceed 200 characters";
+      }
+    }
+
+    if (step === 4 && formData.user_type === "landlord") {
+      if (!/^\d{1,11}$/.test(formData.landlord.phone_number)) {
+        newErrors["landlord.phone_number"] =
+          "Phone number must be numbers only, max 11 digits";
+      }
+      if (formData.landlord.property_name.length > 200) {
+        newErrors["landlord.property_name"] =
+          "Property name cannot exceed 200 characters";
+      }
+      if (formData.landlord.website && !/^https?:\/\/.+/.test(formData.landlord.website)) {
+        newErrors["landlord.website"] = "Enter a valid website URL";
+      }
+      if (formData.landlord.bio.length > 200) {
+        newErrors["landlord.bio"] = "Bio cannot exceed 200 characters";
+      }
     }
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
-  const nextStep = () => {
-    if (validateStep()) setStep(step + 1);
+  // go to next step
+  const handleNext = () => {
+    if (validateStep()) {
+      setStep(step + 1);
+    }
   };
-  const prevStep = () => setStep(step - 1);
 
+  // go back
+  const handleBack = () => {
+    if (step > 1) setStep(step - 1);
+  };
+
+  // submit
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true);
-    setErrors({});
+    if (!validateStep()) return;
 
+    setLoading(true);
     let payload = {
       email: formData.email,
       password: formData.password,
@@ -114,34 +155,23 @@ const Register = () => {
       if (res.success) {
         navigate("/verify", { state: { email: formData.email } });
       } else {
-        if (res.errors) setErrors(res.errors);
-        else if (res.error) setErrors({ general: res.error });
-        else setErrors({ general: "Registration failed. Try again." });
+        setErrors(res.errors || { general: res.error });
       }
     } catch {
       setLoading(false);
-      setErrors({ general: "Unexpected error occurred. Try again." });
+      setErrors({ general: "Unexpected error. Try again." });
     }
   };
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-gray-50 px-4">
-      <div className="w-full max-w-lg rounded-xl bg-white p-8 shadow-md">
-        {/* Progress bar */}
-        <div className="mb-6">
-          <div className="flex justify-between text-sm font-medium text-gray-600">
-            {steps.map((s, i) => (
-              <span key={i} className={i <= step ? "text-green-600" : ""}>
-                {s}
-              </span>
-            ))}
-          </div>
-          <div className="mt-2 h-2 w-full rounded-full bg-gray-200">
-            <div
-              className="h-2 rounded-full bg-green-500 transition-all"
-              style={{ width: `${((step + 1) / steps.length) * 100}%` }}
-            ></div>
-          </div>
+      <div className="w-full max-w-xl rounded-2xl bg-white p-8 shadow-lg">
+        {/* Progress Bar */}
+        <div className="mb-6 h-2 w-full rounded-full bg-gray-200">
+          <div
+            className="h-2 rounded-full bg-green-500 transition-all duration-500"
+            style={{ width: `${(step / 5) * 100}%` }}
+          />
         </div>
 
         {errors.general && (
@@ -151,41 +181,44 @@ const Register = () => {
         )}
 
         <form onSubmit={handleSubmit} className="space-y-4">
-          {/* Step 0: Names */}
-          {step === 0 && (
+          {/* STEP 1: Names */}
+          {step === 1 && (
             <>
               <input
                 type="text"
                 name="first_name"
-                placeholder="First Name"
+                placeholder="First Name *"
                 value={formData.first_name}
                 onChange={handleChange}
                 className="w-full rounded-lg border px-3 py-2"
-                required
               />
+              {errors.first_name && (
+                <p className="text-sm text-red-600">{errors.first_name}</p>
+              )}
               <input
                 type="text"
                 name="last_name"
-                placeholder="Last Name"
+                placeholder="Last Name *"
                 value={formData.last_name}
                 onChange={handleChange}
                 className="w-full rounded-lg border px-3 py-2"
-                required
               />
+              {errors.last_name && (
+                <p className="text-sm text-red-600">{errors.last_name}</p>
+              )}
             </>
           )}
 
-          {/* Step 1: Email + Passwords */}
-          {step === 1 && (
+          {/* STEP 2: Email + Password */}
+          {step === 2 && (
             <>
               <input
                 type="email"
                 name="email"
-                placeholder="Email"
+                placeholder="Email *"
                 value={formData.email}
                 onChange={handleChange}
                 className="w-full rounded-lg border px-3 py-2"
-                required
               />
               {errors.email && <p className="text-sm text-red-600">{errors.email}</p>}
 
@@ -193,46 +226,39 @@ const Register = () => {
                 <input
                   type={showPassword ? "text" : "password"}
                   name="password"
-                  placeholder="Password"
+                  placeholder="Password *"
                   value={formData.password}
                   onChange={handleChange}
-                  className="w-full rounded-lg border px-3 py-2 pr-10"
-                  required
+                  className="w-full rounded-lg border px-3 py-2"
                 />
                 <button
                   type="button"
-                  className="absolute inset-y-0 right-2 flex items-center text-gray-500"
                   onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-2 top-2 text-gray-500"
                 >
-                  {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                  {showPassword ? "🙈" : "👁️"}
                 </button>
               </div>
-              {errors.password && <p className="text-sm text-red-600">{errors.password}</p>}
+              {errors.password && (
+                <p className="text-sm text-red-600">{errors.password}</p>
+              )}
 
-              <div className="relative">
-                <input
-                  type={showPassword2 ? "text" : "password"}
-                  name="password2"
-                  placeholder="Confirm Password"
-                  value={formData.password2}
-                  onChange={handleChange}
-                  className="w-full rounded-lg border px-3 py-2 pr-10"
-                  required
-                />
-                <button
-                  type="button"
-                  className="absolute inset-y-0 right-2 flex items-center text-gray-500"
-                  onClick={() => setShowPassword2(!showPassword2)}
-                >
-                  {showPassword2 ? <EyeOff size={18} /> : <Eye size={18} />}
-                </button>
-              </div>
-              {errors.password2 && <p className="text-sm text-red-600">{errors.password2}</p>}
+              <input
+                type="password"
+                name="password2"
+                placeholder="Confirm Password *"
+                value={formData.password2}
+                onChange={handleChange}
+                className="w-full rounded-lg border px-3 py-2"
+              />
+              {errors.password2 && (
+                <p className="text-sm text-red-600">{errors.password2}</p>
+              )}
             </>
           )}
 
-          {/* Step 2: Role */}
-          {step === 2 && (
+          {/* STEP 3: Role */}
+          {step === 3 && (
             <select
               name="user_type"
               value={formData.user_type}
@@ -244,151 +270,152 @@ const Register = () => {
             </select>
           )}
 
-          {/* Step 3: Role Details */}
-          {step === 3 && (
+          {/* STEP 4: Role-specific fields */}
+          {step === 4 && formData.user_type === "tenant" && (
             <>
-              {formData.user_type === "tenant" && (
-                <>
-                  <input
-                    type="tel"
-                    name="phone_number"
-                    placeholder="Phone Number"
-                    value={formData.phone_number}
-                    onChange={handleChange}
-                    className="w-full rounded-lg border px-3 py-2"
-                  />
-                  <input
-                    type="date"
-                    name="tenant.date_of_birth"
-                    value={formData.tenant.date_of_birth}
-                    onChange={handleChange}
-                    className="w-full rounded-lg border px-3 py-2"
-                  />
-                </>
+              <input
+                type="text"
+                name="phone_number"
+                placeholder="Phone Number *"
+                value={formData.phone_number}
+                onChange={handleChange}
+                className="w-full rounded-lg border px-3 py-2"
+              />
+              {errors.phone_number && (
+                <p className="text-sm text-red-600">{errors.phone_number}</p>
               )}
-              {formData.user_type === "landlord" && (
-                <>
-                  <input
-                    type="tel"
-                    name="landlord.phone_number"
-                    placeholder="Phone Number"
-                    value={formData.landlord.phone_number}
-                    onChange={handleChange}
-                    className="w-full rounded-lg border px-3 py-2"
-                  />
-                  <input
-                    type="text"
-                    name="landlord.property_name"
-                    placeholder="Property Name"
-                    value={formData.landlord.property_name}
-                    onChange={handleChange}
-                    className="w-full rounded-lg border px-3 py-2"
-                  />
-                  <input
-                    type="number"
-                    name="landlord.years_experience"
-                    placeholder="Years of Experience"
-                    value={formData.landlord.years_experience}
-                    onChange={handleChange}
-                    className="w-full rounded-lg border px-3 py-2"
-                  />
-                  <input
-                    type="url"
-                    name="landlord.website"
-                    placeholder="Website"
-                    value={formData.landlord.website}
-                    onChange={handleChange}
-                    className="w-full rounded-lg border px-3 py-2"
-                  />
-                  <input
-                    type="text"
-                    name="landlord.location"
-                    placeholder="Location"
-                    value={formData.landlord.location}
-                    onChange={handleChange}
-                    className="w-full rounded-lg border px-3 py-2"
-                  />
-                </>
+
+              <input
+                type="date"
+                name="tenant.date_of_birth"
+                value={formData.tenant.date_of_birth}
+                onChange={handleChange}
+                className="w-full rounded-lg border px-3 py-2"
+              />
+              {errors["tenant.date_of_birth"] && (
+                <p className="text-sm text-red-600">{errors["tenant.date_of_birth"]}</p>
+              )}
+
+              <textarea
+                name="tenant.bio"
+                placeholder="Bio (max 200 chars)"
+                maxLength="200"
+                value={formData.tenant.bio}
+                onChange={handleChange}
+                className="w-full rounded-lg border px-3 py-2"
+              />
+              {errors["tenant.bio"] && (
+                <p className="text-sm text-red-600">{errors["tenant.bio"]}</p>
               )}
             </>
           )}
 
-          {/* Step 4: Bio */}
-          {step === 4 && (
+          {step === 4 && formData.user_type === "landlord" && (
             <>
-              {formData.user_type === "tenant" ? (
-                <textarea
-                  name="tenant.bio"
-                  placeholder="Tell us about yourself..."
-                  value={formData.tenant.bio}
-                  onChange={handleChange}
-                  className="w-full rounded-lg border px-3 py-2"
-                />
+              <input
+                type="text"
+                name="landlord.phone_number"
+                placeholder="Phone Number *"
+                value={formData.landlord.phone_number}
+                onChange={handleChange}
+                className="w-full rounded-lg border px-3 py-2"
+              />
+              {errors["landlord.phone_number"] && (
+                <p className="text-sm text-red-600">{errors["landlord.phone_number"]}</p>
+              )}
+
+              <input
+                type="text"
+                name="landlord.property_name"
+                placeholder="Property Name (max 200 chars)"
+                maxLength="200"
+                value={formData.landlord.property_name}
+                onChange={handleChange}
+                className="w-full rounded-lg border px-3 py-2"
+              />
+              {errors["landlord.property_name"] && (
+                <p className="text-sm text-red-600">{errors["landlord.property_name"]}</p>
+              )}
+
+              <input
+                type="number"
+                name="landlord.years_experience"
+                placeholder="Years of Experience"
+                value={formData.landlord.years_experience}
+                onChange={handleChange}
+                className="w-full rounded-lg border px-3 py-2"
+              />
+
+              <input
+                type="url"
+                name="landlord.website"
+                placeholder="Website"
+                value={formData.landlord.website}
+                onChange={handleChange}
+                className="w-full rounded-lg border px-3 py-2"
+              />
+              {errors["landlord.website"] && (
+                <p className="text-sm text-red-600">{errors["landlord.website"]}</p>
+              )}
+
+              <textarea
+                name="landlord.bio"
+                placeholder="Bio (max 200 chars)"
+                maxLength="200"
+                value={formData.landlord.bio}
+                onChange={handleChange}
+                className="w-full rounded-lg border px-3 py-2"
+              />
+              {errors["landlord.bio"] && (
+                <p className="text-sm text-red-600">{errors["landlord.bio"]}</p>
+              )}
+
+              <input
+                type="text"
+                name="landlord.location"
+                placeholder="Location"
+                value={formData.landlord.location}
+                onChange={handleChange}
+                className="w-full rounded-lg border px-3 py-2"
+              />
+            </>
+          )}
+
+          {/* STEP 5: Final Submit */}
+          {step === 5 && (
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full rounded-lg bg-green-600 py-2 font-semibold text-white shadow-md hover:bg-green-700"
+            >
+              {loading ? (
+                <div className="h-5 w-5 animate-spin rounded-full border-2 border-white border-t-transparent mx-auto"></div>
               ) : (
-                <textarea
-                  name="landlord.bio"
-                  placeholder="Tell us about yourself..."
-                  value={formData.landlord.bio}
-                  onChange={handleChange}
-                  className="w-full rounded-lg border px-3 py-2"
-                />
+                "Done"
               )}
-            </>
+            </button>
           )}
-
-          {/* Navigation */}
-          <div className="flex justify-between pt-4">
-            {step > 0 && (
-              <button
-                type="button"
-                onClick={prevStep}
-                className="rounded-lg bg-gray-200 px-4 py-2 text-gray-700 hover:bg-gray-300"
-              >
-                Back
-              </button>
-            )}
-            {step < steps.length - 1 ? (
-              <button
-                type="button"
-                onClick={nextStep}
-                className="ml-auto rounded-lg bg-green-600 px-4 py-2 text-white hover:bg-green-700"
-              >
-                Next
-              </button>
-            ) : (
-              <button
-                type="submit"
-                disabled={loading}
-                className="ml-auto flex items-center rounded-lg bg-green-600 px-4 py-2 text-white hover:bg-green-700 disabled:opacity-50"
-              >
-                {loading ? (
-                  <svg
-                    className="h-5 w-5 animate-spin text-white"
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                  >
-                    <circle
-                      className="opacity-25"
-                      cx="12"
-                      cy="12"
-                      r="10"
-                      stroke="currentColor"
-                      strokeWidth="4"
-                    ></circle>
-                    <path
-                      className="opacity-75"
-                      fill="currentColor"
-                      d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
-                    ></path>
-                  </svg>
-                ) : (
-                  "Register"
-                )}
-              </button>
-            )}
-          </div>
         </form>
+
+        {/* Step navigation */}
+        <div className="mt-6 flex justify-between">
+          {step > 1 && step < 5 && (
+            <button
+              onClick={handleBack}
+              className="rounded-lg bg-gray-200 px-4 py-2 text-sm font-medium text-gray-700"
+            >
+              Back
+            </button>
+          )}
+          {step < 5 && (
+            <button
+              onClick={handleNext}
+              className="rounded-lg bg-green-600 px-4 py-2 text-sm font-medium text-white"
+            >
+              Next
+            </button>
+          )}
+        </div>
       </div>
     </div>
   );
