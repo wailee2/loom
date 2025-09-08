@@ -7,8 +7,8 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  // On app load, check if a user token exists
   useEffect(() => {
-    // On app load, try fetching profile if token exists
     const fetchUser = async () => {
       const token = localStorage.getItem("access_token");
       if (token) {
@@ -25,20 +25,35 @@ export const AuthProvider = ({ children }) => {
           setUser(data.data || null);
         } catch {
           setUser(null);
+          localStorage.removeItem("access_token");
+          localStorage.removeItem("user");
         }
       }
       setLoading(false);
     };
+
     fetchUser();
   }, []);
 
+  // Login function
   const login = async (email, password) => {
-    const userData = await loginUser(email, password);
-    setUser(userData);
+    try {
+      const userData = await loginUser(email, password);
+      if (userData?.token) {
+        localStorage.setItem("access_token", userData.token);
+        localStorage.setItem("user", JSON.stringify(userData));
+        setUser(userData);
+      }
+    } catch (err) {
+      throw new Error(err.message || "Login failed");
+    }
   };
 
+  // Logout function
   const logout = () => {
-    logoutUser();
+    logoutUser(); // optional API logout
+    localStorage.removeItem("access_token");
+    localStorage.removeItem("user");
     setUser(null);
   };
 
@@ -49,4 +64,5 @@ export const AuthProvider = ({ children }) => {
   );
 };
 
+// Custom hook to use AuthContext
 export const useAuth = () => useContext(AuthContext);
