@@ -3,7 +3,7 @@ import { useAuth } from "../context/AuthContext";
 import { getMyProfile } from "../api/accounts";
 
 const ProfilePage = () => {
-  const { accessToken } = useAuth();
+  const { accessToken, logout } = useAuth();
   const [profile, setProfile] = useState(null);
 
   useEffect(() => {
@@ -28,6 +28,13 @@ const ProfilePage = () => {
       <p>Name: {profile.first_name} {profile.last_name}</p>
       <p>Phone: {profile.phone_number}</p>
       <p>Bio: {profile.bio}</p>
+
+      <button
+        className="px-4 py-2 bg-green-500 text-white rounded mb-6"
+        onClick={logout}
+      >
+        Logout
+      </button>
     </div>
   );
 };
