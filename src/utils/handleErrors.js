@@ -7,10 +7,12 @@ export const useHandle404Redirect = () => {
 
   const handle404 = useCallback(
     (err) => {
-      if (err?.status === 404) {
+      const status = err?.response?.status || err?.status;
+
+      if (status === 404) {
         navigate("/page-not-found");
       } else {
-        console.error(err);
+        console.error("Unhandled error:", err);
       }
     },
     [navigate]
