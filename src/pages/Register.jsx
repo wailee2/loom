@@ -603,6 +603,7 @@ const Register = () => {
 
               {step === 5 && (
                 <>
+                <div className="text-lg text-gray-800 mb-1 lg:hidden block">Please select your birthday</div>
                   {/* BIRTHDAY PICKER*/}
                   <div className="flex bgorange-400 p-4 rounded-xl flex-col lg:flex-row gap-6 relative">
                     {/* LEFT: Calendar */}
@@ -792,8 +793,11 @@ const Register = () => {
                     </div>
 
                     {/* RIGHT: Preview + controls */}
-                    <div className="w-full lg:w-[50%] rounded-md p-4 flex flex-col flex-wrapx justify-between ">
-                      <div className="text-lg text-gray-800 mb-1">Please select your birthday</div>
+                    <div
+                      className="
+                      w-full lg:w-[50%] rounded-md p-4 flex flex-col flex-wrapx justify-between "
+                    >
+                      <div className="text-lg text-gray-800 mb-1 hidden lg:block">Please select your birthday</div>
                       <div>
                         <div className="flex flex-wrap items-baseline gap-3 text-[#1a1a1a]">
                           <div className="flex flex-wrap items-baseline gap-3">
