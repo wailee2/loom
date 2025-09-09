@@ -18,7 +18,7 @@ const UserProfile = () => {
         const data = await getProfileByUsername(username, accessToken);
         setProfile(data);
       } catch (err) {
-        if (err.message.includes("404")) {
+        if (err.status === 404) {
           // Redirect to 404 page
           navigate("/page-not-found");
         } else {
