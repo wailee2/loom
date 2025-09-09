@@ -4,11 +4,13 @@ import { useAuth } from "../context/AuthContext";
 import { useNavigate, Link } from "react-router-dom";
 import { LucideSearch } from "lucide-react";
 import { getProfileByUsername } from "../api/accounts";
+import { useHandle404Redirect } from "../utils/handleErrors";
 
 const Dashboard = () => {
   const { user, logout, accessToken } = useAuth();
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState("");
+  const handle404 = useHandle404Redirect();
 
   if (!user) {
     navigate("/login");
@@ -25,12 +27,7 @@ const Dashboard = () => {
       // Navigate to profile if exists
       navigate(`/profile/${searchQuery}`);
     } catch (err) {
-      if (err.status === 404) {
-        // Redirect to 404 page if user not found
-        navigate("/page-not-found");
-      } else {
-        console.error(err);
-      }
+      handle404(err);
     } finally {
       setSearchQuery("");
     }

@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import { getProfileByUsername } from "../api/accounts";
 import { useNavigate } from "react-router-dom";
+import { useHandle404Redirect } from "../utils/handleErrors";
 import SearchResults from "./SearchResults";
 
 const Search = () => {
@@ -12,6 +13,7 @@ const Search = () => {
   const [results, setResults] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const handle404 = useHandle404Redirect();
 
   const handleSearch = async (e) => {
     e.preventDefault();
@@ -23,13 +25,7 @@ const Search = () => {
       const profile = await getProfileByUsername(query, accessToken);
       setResults([profile]);
     } catch (err) {
-      // Check the status code instead of message
-      if (err.status === 404) {
-        navigate("/page-not-found");
-      } else {
-        setError(err.message || "An error occurred");
-        setResults([]);
-      }
+      handle404(err);
     } finally {
       setLoading(false);
     }
