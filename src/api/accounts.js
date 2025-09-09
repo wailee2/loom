@@ -1,37 +1,29 @@
-// src/api/accounts.js
-const BASE_URL = "https://greengrass-backend.onrender.com/api/accounts";
+const API_BASE = "https://greengrass-backend.onrender.com/api/accounts";
 
-export const getProfile = async (accessToken) => {
-  try {
-    const res = await fetch(`${BASE_URL}/profile/`, {
-      headers: { Authorization: `Bearer ${accessToken}` },
-    });
-    const data = await res.json();
-    return data;
-  } catch (err) {
-    console.error("Profile fetch error:", err);
-    return null;
-  }
+export const getMyProfile = async (token) => {
+  const res = await fetch(`${API_BASE}/profile/`, {
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  if (!res.ok) throw new Error("Failed to fetch profile");
+  return res.json();
 };
 
-export const getProfileByUsername = async (username, accessToken) => {
-  try {
-    const res = await fetch(`${BASE_URL}/profile/${username}/`, {
-      headers: { Authorization: `Bearer ${accessToken}` },
-    });
-    return await res.json();
-  } catch (err) {
-    console.error("Profile fetch by username error:", err);
-    return null;
-  }
+export const getProfileByUsername = async (username, token) => {
+  const res = await fetch(`${API_BASE}/profile/${username}/`, {
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  if (!res.ok) throw new Error("Failed to fetch user profile");
+  return res.json();
 };
 
 export const getLandlords = async () => {
-  try {
-    const res = await fetch(`${BASE_URL}/landlords/`);
-    return await res.json();
-  } catch (err) {
-    console.error("Landlord list fetch error:", err);
-    return [];
-  }
+  const res = await fetch(`${API_BASE}/landlords/`);
+  if (!res.ok) throw new Error("Failed to fetch landlords");
+  return res.json();
 };
