@@ -1,15 +1,16 @@
 // src/pages/UserProfile.jsx
 import React, { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams} from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { getProfileByUsername } from "../api/accounts";
+import { useHandle404Redirect } from "../utils/handleErrors";
 
 const UserProfile = () => {
   const { username } = useParams();
   const { accessToken } = useAuth();
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
-  const navigate = useNavigate();
+  const handle404 = useHandle404Redirect();
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -18,19 +19,14 @@ const UserProfile = () => {
         const data = await getProfileByUsername(username, accessToken);
         setProfile(data);
       } catch (err) {
-        if (err.status === 404) {
-          // Redirect to 404 page
-          navigate("/page-not-found");
-        } else {
-          console.error(err);
-        }
+        handle404(err);
       } finally {
         setLoading(false);
       }
     };
 
     if (accessToken) fetchProfile();
-  }, [username, accessToken, navigate]);
+  }, [username, accessToken, handle404]);
 
   if (loading) return <p>Loading profile...</p>;
   if (!profile) return null; // Already redirected if 404
