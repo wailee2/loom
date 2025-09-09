@@ -17,7 +17,7 @@ const ProfilePage = () => {
         setProfile(data);
       } catch (err) {
         handle404(err);
-      }finally {
+      } finally {
         setLoading(false);
       }
     };
@@ -29,10 +29,19 @@ const ProfilePage = () => {
     <HandleLoading loading={loading}>
       <div className="p-4 border rounded shadow mb-6">
         <h2 className="text-xl font-semibold mb-2">My Profile</h2>
-        <p>Email: {profile.email}</p>
-        <p>Name: {profile.first_name} {profile.last_name}</p>
-        <p>Phone: {profile.phone_number}</p>
-        <p>Bio: {profile.bio}</p>
+
+        {profile ? (
+          <>
+            <p>Email: {profile.email}</p>
+            <p>
+              Name: {profile.first_name} {profile.last_name}
+            </p>
+            <p>Phone: {profile.phone_number}</p>
+            <p>Bio: {profile.bio}</p>
+          </>
+        ) : (
+          <p>No profile found.</p>
+        )}
 
         <button
           className="px-4 py-2 bg-green-500 text-white rounded mb-6"
