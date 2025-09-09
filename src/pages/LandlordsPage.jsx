@@ -1,3 +1,5 @@
+//LandlordsPage.jsx
+//this is page is a list of landlords
 import React, { useEffect, useState } from "react";
 import { getLandlords } from "../api/accounts";
 
@@ -23,11 +25,20 @@ const LandlordsPage = ({ children }) => {
 
   return (
     <ul className="list-disc pl-5">
-      {landlords.map((landlord) => (
-        <li key={landlord.id}>
-          {landlord.first_name} {landlord.last_name}
-        </li>
-      ))}
+      {(landlords) => (
+        <ul className="list-disc pl-5">
+            {landlords.map((landlord) => (
+            <li key={landlord.id}>
+                <Link
+                className="text-blue-600 hover:underline"
+                to={`/profile/${landlord.username}`}
+                >
+                {landlord.first_name} {landlord.last_name}
+                </Link>
+            </li>
+            ))}
+        </ul>
+        )}
     </ul>
   );
 };

@@ -1,8 +1,6 @@
 import React from "react";
 import { useAuth } from "../context/AuthContext";
-import { useNavigate } from "react-router-dom";
-import ProfilePage from "./ProfilePage";
-import LandlordsPage from "./LandlordsPage";
+import { useNavigate, Link } from "react-router-dom";
 
 const Dashboard = () => {
   const { user, logout } = useAuth();
@@ -20,14 +18,19 @@ const Dashboard = () => {
       </h1>
 
       <button
-        className="px-4 py-2 bg-red-500 text-white rounded mb-6"
+        className="px-4 py-2 bg-green-500 text-white rounded mb-6"
         onClick={logout}
       >
         Logout
       </button>
 
-      <ProfilePage />
-      <LandlordsPage />
+      {/* Link to Profile Page */}
+      <Link
+        to="/profile"
+        className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition"
+      >
+        Go to Profile
+      </Link>
     </div>
   );
 };

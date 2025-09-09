@@ -23,7 +23,7 @@ const ProfilePage = () => {
 
   return (
     <div className="p-4 border rounded shadow mb-6">
-      <h2 className="text-xl font-semibold mb-2">Tenant Profile</h2>
+      <h2 className="text-xl font-semibold mb-2">My Profile</h2>
       <p>Email: {profile.email}</p>
       <p>Name: {profile.first_name} {profile.last_name}</p>
       <p>Phone: {profile.phone_number}</p>
