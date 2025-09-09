@@ -1,11 +1,12 @@
 // src/pages/Dashboard.jsx
 import React, { useState } from "react";
 import { useAuth } from "../context/AuthContext";
-import { useNavigate, Link, useNavigate as useRouterNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { LucideSearch } from "lucide-react";
+import { getProfileByUsername } from "../api/accounts";
 
 const Dashboard = () => {
-  const { user, logout } = useAuth();
+  const { user, logout, accessToken } = useAuth();
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState("");
 
@@ -14,12 +15,25 @@ const Dashboard = () => {
     return null;
   }
 
-  const handleSearch = (e) => {
+  const handleSearch = async (e) => {
     e.preventDefault();
     if (!searchQuery) return;
-    // Navigate to /profile/:username dynamically
-    navigate(`/profile/${searchQuery}`);
-    setSearchQuery("");
+
+    try {
+      // Check if user exists
+      await getProfileByUsername(searchQuery, accessToken);
+      // Navigate to profile if exists
+      navigate(`/profile/${searchQuery}`);
+    } catch (err) {
+      if (err.message.includes("404")) {
+        // Redirect to 404 page if user not found
+        navigate("/404");
+      } else {
+        console.error(err);
+      }
+    } finally {
+      setSearchQuery("");
+    }
   };
 
   return (
@@ -29,7 +43,6 @@ const Dashboard = () => {
       </h1>
 
       <div className="flex gap-4 mb-6 flex-wrap">
-        {/* Logout Button */}
         <button
           className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 transition"
           onClick={logout}
@@ -37,7 +50,6 @@ const Dashboard = () => {
           Logout
         </button>
 
-        {/* Link to Profile Page */}
         <Link
           to="/profile"
           className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition"
@@ -45,7 +57,6 @@ const Dashboard = () => {
           Go to Profile
         </Link>
 
-        {/* Link to Search Page */}
         <Link
           to="/search"
           className="flex items-center px-4 py-2 bg-gray-700 text-white rounded hover:bg-gray-800 transition"
@@ -55,7 +66,6 @@ const Dashboard = () => {
         </Link>
       </div>
 
-      {/* Inline Quick Search */}
       <form onSubmit={handleSearch} className="flex max-w-md mb-4">
         <input
           type="text"

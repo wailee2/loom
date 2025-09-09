@@ -1,44 +1,39 @@
 // src/pages/UserProfile.jsx
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
-import { useAuth } from "../context/AuthContext"; // assuming you have AuthContext
-import { getProfileByUsername } from "../api/accounts"; // your API functions
+import { useParams, useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
+import { getProfileByUsername } from "../api/account";
 
 const UserProfile = () => {
-  const { username } = useParams(); // get username from URL
+  const { username } = useParams();
   const { accessToken } = useAuth();
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const navigate = useNavigate();
 
-  // Inside useEffect fetch
   useEffect(() => {
     const fetchProfile = async () => {
       try {
         setLoading(true);
         const data = await getProfileByUsername(username, accessToken);
         setProfile(data);
-        setError(null);
       } catch (err) {
         if (err.message.includes("404")) {
-          setError(`User "${username}" not found.`);
+          // Redirect to 404 page
+          navigate("/404");
         } else {
-          setError(err.message);
+          console.error(err);
         }
-        setProfile(null);
       } finally {
         setLoading(false);
       }
     };
 
     if (accessToken) fetchProfile();
-  }, [username, accessToken]);
-
+  }, [username, accessToken, navigate]);
 
   if (loading) return <p>Loading profile...</p>;
-  if (error) return <p className="text-red-500">{error}</p>;
-  if (!profile) return null;
-
+  if (!profile) return null; // Already redirected if 404
 
   return (
     <div className="max-w-2xl mx-auto p-4 bg-white shadow-md rounded-md">
@@ -47,7 +42,6 @@ const UserProfile = () => {
       <p><strong>Email:</strong> {profile.email}</p>
       {profile.phone && <p><strong>Phone:</strong> {profile.phone}</p>}
       {profile.bio && <p><strong>Bio:</strong> {profile.bio}</p>}
-      {/* Add more fields as needed */}
     </div>
   );
 };
