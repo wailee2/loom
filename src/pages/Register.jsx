@@ -3,6 +3,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { Eye, EyeOff } from "lucide-react";
+import { HiChevronLeft, HiChevronRight } from "react-icons/hi";
 import TenantRegister from "../components/Register/TenantRegister";
 import LandlordRegister from "../components/Register/LandlordRegister";
 
@@ -605,7 +606,7 @@ const Register = () => {
                   {/* BIRTHDAY PICKER*/}
                   <div className="flex bgorange-400 p-4 rounded-xl flex-col lg:flex-row gap-6 relative">
                     {/* LEFT: Calendar */}
-                    <div className="w-full lg:w-[50%] bg-grmeen-300 roundemd-md pm-3 shadomw-sm">
+                    <div className="w-full lg:w-[50%] pm-3 shadomw-sm">
                       {/*Day Month and Year  */}
                       <div
                         className="
@@ -663,16 +664,16 @@ const Register = () => {
 
 
                       {/* Month and Year with arrows */}
-                      <div className="flex items-center justify-center gap-3">
+                      <div className="flex items-center justify-between gap-3 mt-7 mb-5.5">
                         <button
                           type="button"
                           onClick={handlePrevMonth}
                           className="rounded-full p-2 hover:bg-gray-100"
                           aria-label="Previous"
                         >
-                          ←
+                          <HiChevronLeft className="w-9 h-9 text-green-600" />
                         </button>
-                        <div className="px-3 py-1 rounded-md text-sm font-medium">
+                        <div className="px-3 py-1 rounded-md text-lg ">
                           {monthNames[bpMonth]} {bpYear}
                         </div>
                         <button
@@ -681,7 +682,7 @@ const Register = () => {
                           className="rounded-full p-2 hover:bg-gray-100"
                           aria-label="Next"
                         >
-                          →
+                          <HiChevronRight className="w-9 h-9 text-green-600" />
                         </button>
                       </div>
 
@@ -689,7 +690,7 @@ const Register = () => {
                       <div>
                         {bpView === "day" && (
                           <div>
-                            <div className="grid grid-cols-7 gap-2 text-xs text-center text-gray-500 mb-2">
+                            <div className="grid grid-cols-7 gap-2 text-[17px] text-center text-gray-500 mb-2">
                               {["Sun","Mon","Tue","Wed","Thu","Fri","Sat"].map((d) => (
                                 <div key={d}>{d}</div>
                               ))}
@@ -714,11 +715,18 @@ const Register = () => {
                                     key={day}
                                     type="button"
                                     onClick={() => handlePickDay(day)}
-                                    className={`h-10 rounded-md flex items-center justify-center text-sm font-medium hover:bg-gray-100 ${
-                                      selected ? "bg-green-600 text-white" : "text-gray-700"
+                                    className={`h-10 rounded-md flex items-center justify-center text-sm font-medium  ${
+                                      selected ? "bg-gray-200  text-white hover:bg-gray-100" : "text-gray-700 bg-gray-100"
                                     }`}
                                   >
-                                    {day}
+                                    <span
+                                      className={`
+                                        w-[83%] h-[83%] rounded-sm flex items-center justify-center text-sm font-medium hover:bg-gray-100 p-2 ${
+                                        selected ? "bg-green-600 text-white hover:bg-green-600 " : "text-gray-700 bg-gray-100"
+                                      }`}
+                                    >
+                                      {day}
+                                    </span>
                                   </button>
                                 );
                               })}
