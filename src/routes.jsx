@@ -56,6 +56,7 @@ const AppRoutes = () => {
           </PrivateRoute>
         }
       />
+      <Route path="/page-not-found" element={<PageNotFound />} />
       <Route path="*" element={<PageNotFound />} />
     </Routes>
   );

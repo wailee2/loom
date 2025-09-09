@@ -27,7 +27,7 @@ const Dashboard = () => {
     } catch (err) {
       if (err.message.includes("404")) {
         // Redirect to 404 page if user not found
-        navigate("/404");
+        navigate("/page-not-found");
       } else {
         console.error(err);
       }

@@ -20,7 +20,7 @@ const UserProfile = () => {
       } catch (err) {
         if (err.message.includes("404")) {
           // Redirect to 404 page
-          navigate("/404");
+          navigate("/page-not-found");
         } else {
           console.error(err);
         }

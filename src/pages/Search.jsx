@@ -1,11 +1,13 @@
 // src/pages/Search.jsx
 import React, { useState } from "react";
 import { useAuth } from "../context/AuthContext";
-import { getProfileByUsername } from "../api/accounts"; // import your API functions
+import { getProfileByUsername } from "../api/accounts";
+import { useNavigate } from "react-router-dom";
 import SearchResults from "./SearchResults";
 
 const Search = () => {
   const { accessToken } = useAuth();
+  const navigate = useNavigate();
   const [query, setQuery] = useState("");
   const [results, setResults] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -18,12 +20,16 @@ const Search = () => {
     try {
       setLoading(true);
       setError(null);
-      // For simplicity, assume searching by exact username.
       const profile = await getProfileByUsername(query, accessToken);
-      setResults([profile]); // Wrap in array for SearchResults
+      setResults([profile]);
     } catch (err) {
-      setError(err.message);
-      setResults([]);
+      if (err.message.includes("404")) {
+        // Redirect to Page Not Found instead of showing error
+        navigate("/page-not-found");
+      } else {
+        setError(err.message);
+        setResults([]);
+      }
     } finally {
       setLoading(false);
     }
@@ -48,7 +54,6 @@ const Search = () => {
       </form>
 
       {loading && <p>Searching...</p>}
-      {error && <p className="text-red-500">{error}</p>}
       {!loading && !error && results.length > 0 && (
         <SearchResults results={results} />
       )}
