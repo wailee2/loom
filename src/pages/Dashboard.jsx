@@ -6,7 +6,6 @@ import { LucideSearch } from "lucide-react";
 import { getProfileByUsername } from "../api/accounts";
 import { useHandle404Redirect } from "../utils/handleErrors";
 
-
 const Dashboard = () => {
   const { user, logout, accessToken } = useAuth();
   const navigate = useNavigate();
