@@ -1,15 +1,15 @@
-// src/pages/Dashboard.jsx
 import React from "react";
 import { useAuth } from "../context/AuthContext";
+import LandlordDashboard from "../components/Dashboard/LandlordDashboard";
+import TenantDashboard from "../components/Dashboard/TenantDashboard";
 
 const Dashboard = () => {
-  const { user, logout } = useAuth();
+  const { user } = useAuth();
 
   return (
-    <div>
-      <h1>Welcome, {user?.first_name}</h1>
-      <p>User type: {user?.user_type}</p>
-      <button onClick={logout}>Logout</button>
+    <div className="p-6">
+      {user?.user_type === "landlord" ? <LandlordDashboard /> : null}
+      {user?.user_type === "tenant" ? <TenantDashboard /> : null}
     </div>
   );
 };
