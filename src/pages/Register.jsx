@@ -144,13 +144,31 @@ const Register = () => {
         newErrors.password = "Password is required";
       } else {
         if (formData.password.length < 8) {
-          newErrors.password = "Password must be at least 8 characters";
+          newErrors.password = "Password must be at least 8 characters long";
         }
-        if (!/[0-9]/.test(formData.password)) {
-          newErrors.password = "Password must contain at least one number";
+
+        if (/^\d+$/.test(formData.password)) {
+          newErrors.password = "Password cannot be entirely numeric";
         }
-        if (!/[A-Za-z]/.test(formData.password)) {
-          newErrors.password = "Password must contain at least one letter";
+
+        const lowered = formData.password.toLowerCase();
+        if (
+          formData.first_name &&
+          lowered.includes(formData.first_name.toLowerCase())
+        ) {
+          newErrors.password = "Password is too similar to your first name";
+        }
+        if (
+          formData.last_name &&
+          lowered.includes(formData.last_name.toLowerCase())
+        ) {
+          newErrors.password = "Password is too similar to your last name";
+        }
+        if (
+          formData.email &&
+          lowered.includes(formData.email.split("@")[0].toLowerCase())
+        ) {
+          newErrors.password = "Password is too similar to your email";
         }
       }
 
@@ -158,6 +176,7 @@ const Register = () => {
         newErrors.password2 = "Passwords do not match";
       }
     }
+
 
     // STEP 3: Role selection
     if (step === 3) {
