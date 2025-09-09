@@ -422,8 +422,8 @@ const Register = () => {
 
   // Render
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gray-50 px-4">
-      <div className="w-full max-w-xl rounded-2xl bg-white p-8 shadow-lg">
+    <div className="flex min-h-screen items-center justify-center bg-pink-300 px-4">
+      <div className={`w-full ${step === 5 ? 'max-w-4xl' : 'max-w-2xl'} rounded-2xl bg-blue-700 p-8 shadow-lg`}>
         {/* Progress Bar */}
         <div className="mb-6 h-2 w-full rounded-full bg-gray-200">
           <div
@@ -582,11 +582,11 @@ const Register = () => {
 
               {step === 5 && (
                 <>
-                  {/* MODERN BIRTHDAY PICKER - START */}
-                  <div className="border-2 border-green-500 rounded-xl p-4">
+                  {/* BIRTHDAY PICKER*/}
+                  <div className="border-2 border-green-500 rounded-xl bg-amber-400 p-4">
                     <div className="flex flex-col lg:flex-row gap-4">
                       {/* LEFT: Calendar */}
-                      <div className="w-full lg:w-2/3 bg-white rounded-md p-3 shadow-sm">
+                      <div className="w-full lg:w-2/3 bg-green-300 rounded-md p-3 shadow-sm">
                         {/* Top Header: day month year (clickable) */}
                         <div className="flex flex-col items-center justify-between mb-3 ">
                           <div className="flex gap-3 items-center">
