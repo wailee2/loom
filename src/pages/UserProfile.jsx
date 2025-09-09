@@ -11,25 +11,34 @@ const UserProfile = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  // Inside useEffect fetch
   useEffect(() => {
     const fetchProfile = async () => {
       try {
         setLoading(true);
         const data = await getProfileByUsername(username, accessToken);
         setProfile(data);
+        setError(null);
       } catch (err) {
-        setError(err.message);
+        if (err.message.includes("404")) {
+          setError(`User "${username}" not found.`);
+        } else {
+          setError(err.message);
+        }
+        setProfile(null);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchProfile();
+    if (accessToken) fetchProfile();
   }, [username, accessToken]);
 
+
   if (loading) return <p>Loading profile...</p>;
-  if (error) return <p>Error: {error}</p>;
-  if (!profile) return <p>No profile found.</p>;
+  if (error) return <p className="text-red-500">{error}</p>;
+  if (!profile) return null;
+
 
   return (
     <div className="max-w-2xl mx-auto p-4 bg-white shadow-md rounded-md">
