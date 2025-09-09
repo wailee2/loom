@@ -8,6 +8,7 @@ import Dashboard from "./pages/Dashboard";
 import ProfilePage from "./pages/ProfilePage";
 import UserProfile from "./pages/UserProfile";
 import Search from "./pages/Search";
+import PageNotFound from "./pages/PageNotFound";
 import { useAuth } from "./context/AuthContext";
 
 const PrivateRoute = ({ children }) => {
@@ -15,6 +16,7 @@ const PrivateRoute = ({ children }) => {
   if (loading) return <div>Loading...</div>;
   return user ? children : <Navigate to="/login" />;
 };
+
 
 const AppRoutes = () => {
   return (
@@ -54,7 +56,7 @@ const AppRoutes = () => {
           </PrivateRoute>
         }
       />
-      <Route path="*" element={<Navigate to="/login" />} />
+      <Route path="*" element={<PageNotFound />} />
     </Routes>
   );
 };
