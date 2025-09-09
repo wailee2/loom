@@ -23,16 +23,17 @@ const Search = () => {
       const profile = await getProfileByUsername(query, accessToken);
       setResults([profile]);
     } catch (err) {
-      if (err.message.includes("404")) {
-        // Redirect to Page Not Found instead of showing error
+      // Check the status code instead of message
+      if (err.status === 404) {
         navigate("/page-not-found");
       } else {
-        setError(err.message);
+        setError(err.message || "An error occurred");
         setResults([]);
       }
     } finally {
       setLoading(false);
     }
+
   };
 
   return (

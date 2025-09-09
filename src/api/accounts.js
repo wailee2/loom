@@ -18,7 +18,14 @@ export const getProfileByUsername = async (username, token) => {
       Authorization: `Bearer ${token}`,
     },
   });
-  if (!res.ok) throw new Error("Failed to fetch user profile");
+
+  if (!res.ok) {
+    // Throw an error with the actual status code
+    const error = new Error("Failed to fetch user profile");
+    error.status = res.status;
+    throw error;
+  }
+
   return res.json();
 };
 
