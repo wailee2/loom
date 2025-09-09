@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { useAuth } from "../context/AuthContext"; // assuming you have AuthContext
-import { getProfileByUsername } from "../api/profile"; // your API functions
+import { getProfileByUsername } from "../api/accounts"; // your API functions
 
 const UserProfile = () => {
   const { username } = useParams(); // get username from URL
