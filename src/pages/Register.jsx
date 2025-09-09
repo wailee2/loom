@@ -441,18 +441,10 @@ const Register = () => {
     <div className="flex min-h-screen items-center justify-center bg-pink-300 px-4">
       <div
         className={`w-full ${
-          step === 6
-            ? formData?.tenant
-              ? 'max-w-4xl' // tenant step 5
-              : formData?.landlord
-              ? 'max-w-xl'  // landlord step 5
-              : 'max-w-xl'  // default fallback for step 5
-            : step === maxStep
-            ? 'max-w-2xl'
-            : 'max-w-xl'
-        } rounded-2xl bg-white p-8 shadow-lg`}
+            step === 5 ? 'max-w-2xl' : step === maxStep ? 'max-w-2xl' : 'max-w-xl'
+          } rounded-2xl bg-white p-8 shadow-lg`
+        }
       >
-
         {/* Progress Bar */}
         <div className="mb-6 h-2 w-full rounded-full bg-gray-200">
           <div
