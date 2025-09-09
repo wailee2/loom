@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { getLandlords } from "../api/accounts";
 
-const LandlordsPage = () => {
+const LandlordsPage = ({ children }) => {
   const [landlords, setLandlords] = useState([]);
 
   useEffect(() => {
@@ -17,19 +17,18 @@ const LandlordsPage = () => {
     fetchLandlords();
   }, []);
 
+  if (children) return children(landlords);
+
   if (!landlords.length) return <p>No landlords found.</p>;
 
   return (
-    <div className="p-4 border rounded shadow">
-      <h2 className="text-xl font-semibold mb-2">Landlords</h2>
-      <ul className="list-disc pl-5">
-        {landlords.map((landlord) => (
-          <li key={landlord.id}>
-            {landlord.first_name} {landlord.last_name}
-          </li>
-        ))}
-      </ul>
-    </div>
+    <ul className="list-disc pl-5">
+      {landlords.map((landlord) => (
+        <li key={landlord.id}>
+          {landlord.first_name} {landlord.last_name}
+        </li>
+      ))}
+    </ul>
   );
 };
 
