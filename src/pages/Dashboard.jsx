@@ -24,6 +24,8 @@ const Dashboard = () => {
         Logout
       </button>
 
+      
+
       {/* Link to Profile Page */}
       <Link
         to="/profile"

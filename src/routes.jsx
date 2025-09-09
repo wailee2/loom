@@ -6,6 +6,7 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Dashboard from "./pages/Dashboard";
 import ProfilePage from "./pages/ProfilePage";
+import UserProfile from "./pages/UserProfile";
 import { useAuth } from "./context/AuthContext";
 
 const PrivateRoute = ({ children }) => {
@@ -33,6 +34,14 @@ const AppRoutes = () => {
         element={
           <PrivateRoute>
             <ProfilePage />
+          </PrivateRoute>
+        }
+      />
+      <Route
+        path="/profile/:username"
+        element={
+          <PrivateRoute>
+            <UserProfile />
           </PrivateRoute>
         }
       />
