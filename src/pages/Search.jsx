@@ -2,8 +2,9 @@
 import React, { useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import { getProfileByUsername } from "../api/accounts";
-import { useHandle404Redirect } from "../utils/handleErrors";
 import SearchResults from "./SearchResults";
+import { useHandle404Redirect } from "../utils/handleErrors";
+import HandleLoading from "../utils/HandleLoading";
 
 const Search = () => {
   const { accessToken } = useAuth();
@@ -48,13 +49,12 @@ const Search = () => {
         </button>
       </form>
 
-      {loading && <p>Searching...</p>}
-      {!loading && !error && results.length > 0 && (
-        <SearchResults results={results} />
-      )}
-      {!loading && !error && results.length === 0 && query && (
-        <p>No users found.</p>
-      )}
+      <HandleLoading loading={loading}>
+        {!error && results.length > 0 && <SearchResults results={results} />}
+        {!error && results.length === 0 && query && (
+          <p className="text-gray-500">No users found.</p>
+        )}
+      </HandleLoading>
     </div>
   );
 };

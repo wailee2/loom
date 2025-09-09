@@ -9,6 +9,7 @@ import ProfilePage from "./pages/ProfilePage";
 import UserProfile from "./pages/UserProfile";
 import Search from "./pages/Search";
 import PageNotFound from "./pages/PageNotFound";
+import Landlords from "./pages/Landlords";
 import { useAuth } from "./context/AuthContext";
 
 const PrivateRoute = ({ children }) => {
@@ -53,6 +54,14 @@ const AppRoutes = () => {
         element={
           <PrivateRoute>
             <Search />
+          </PrivateRoute>
+        }
+      />
+      <Route
+        path="/landlords"
+        element={
+          <PrivateRoute>
+            <Landlords />
           </PrivateRoute>
         }
       />

@@ -438,11 +438,11 @@ const Register = () => {
 
   // Render
   return (
-    <div className="flex min-h-screen items-center justify-center bg-pink-300 px-4">
+    <div className="flex min-h-screen items-center justify-center bg-gray-100 px-4">
       <div
         className={`w-full ${
             step === 5 ? 'max-w-2xl' : step === maxStep ? 'max-w-2xl' : 'max-w-xl'
-          } rounded-2xl bg-white p-8 shadow-lg`
+          } rounded-2xl bg-white p-4 md:p-6 lg:p-8 shadow-lg`
         }
       >
         {/* Progress Bar */}
@@ -1021,14 +1021,14 @@ const Register = () => {
                 <button
                   type="button"
                   onClick={handleBack}
-                  className="rounded-lg bg-gray-300 px-4 py-2 font-semibold text-gray-700"
+                  className="rounded-full bg-gray-300 px-6 py-2 font-semibold text-gray-700"
                 >
                   Back
                 </button>
                 <button
                   type="submit"
                   disabled={loading}
-                  className="ml-auto flex items-center justify-center rounded-lg bg-green-600 px-4 py-2 font-semibold text-white hover:bg-green-700"
+                  className="ml-auto flex items-center justify-center rounded-full bg-green-600 px-6 py-2 font-semibold text-white hover:bg-green-700"
                 >
                   {loading ? (
                     <svg
@@ -1068,7 +1068,7 @@ const Register = () => {
           {step > 1 && step < maxStep && (
             <button
               onClick={handleBack}
-              className="rounded-lg bg-gray-200 px-4 py-2 text-sm font-medium text-gray-700"
+              className="rounded-full bg-gray-200 px-6 py-2 text-sm font-medium text-gray-700"
             >
               Back
             </button>
@@ -1076,7 +1076,7 @@ const Register = () => {
           {step < maxStep && (
             <button
               onClick={handleNext}
-              className="ml-auto rounded-lg bg-green-600 px-4 py-2 text-sm font-medium text-white"
+              className="ml-auto rounded-full bg-green-600 px-6 py-2 text-sm font-medium text-white"
             >
               Next
             </button>
