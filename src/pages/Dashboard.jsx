@@ -25,7 +25,7 @@ const Dashboard = () => {
       // Navigate to profile if exists
       navigate(`/profile/${searchQuery}`);
     } catch (err) {
-      if (err.message.includes("404")) {
+      if (err.status === 404) {
         // Redirect to 404 page if user not found
         navigate("/page-not-found");
       } else {
@@ -35,6 +35,7 @@ const Dashboard = () => {
       setSearchQuery("");
     }
   };
+
 
   return (
     <div className="p-6">
