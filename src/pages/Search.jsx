@@ -2,13 +2,11 @@
 import React, { useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import { getProfileByUsername } from "../api/accounts";
-import { useNavigate } from "react-router-dom";
 import { useHandle404Redirect } from "../utils/handleErrors";
 import SearchResults from "./SearchResults";
 
 const Search = () => {
   const { accessToken } = useAuth();
-  const navigate = useNavigate();
   const [query, setQuery] = useState("");
   const [results, setResults] = useState([]);
   const [loading, setLoading] = useState(false);
