@@ -5,4 +5,4 @@
   {
   "email": "landlord12@example.com",
   "password": "securepassword123"
-}.
+}

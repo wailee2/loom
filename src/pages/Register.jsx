@@ -441,10 +441,18 @@ const Register = () => {
     <div className="flex min-h-screen items-center justify-center bg-pink-300 px-4">
       <div
         className={`w-full ${
-            step === 5 ? 'max-w-4xl' : step === maxStep ? 'max-w-2xl' : 'max-w-xl'
-          } rounded-2xl bg-white p-8 shadow-lg`
-        }
+          step === 6
+            ? formData?.tenant
+              ? 'max-w-4xl' // tenant step 5
+              : formData?.landlord
+              ? 'max-w-xl'  // landlord step 5
+              : 'max-w-xl'  // default fallback for step 5
+            : step === maxStep
+            ? 'max-w-2xl'
+            : 'max-w-xl'
+        } rounded-2xl bg-white p-8 shadow-lg`}
       >
+
         {/* Progress Bar */}
         <div className="mb-6 h-2 w-full rounded-full bg-gray-200">
           <div
@@ -469,7 +477,8 @@ const Register = () => {
                 placeholder="First Name *"
                 value={formData.first_name}
                 onChange={handleChange}
-                className="w-full rounded-lg border px-3 py-2"
+                className="
+                w-full rounded-lg border border-gray-300 px-3 py-2 text-gray-900 shadow-sm focus:border-green-500 focus:ring-2 focus:ring-green-400 focus:outline-none"
               />
               {errors.first_name && (
                 <p className="text-sm text-red-600">{errors.first_name}</p>
@@ -480,7 +489,8 @@ const Register = () => {
                 placeholder="Last Name *"
                 value={formData.last_name}
                 onChange={handleChange}
-                className="w-full rounded-lg border px-3 py-2"
+                className="
+                w-full rounded-lg border border-gray-300 px-3 py-2 text-gray-900 shadow-sm focus:border-green-500 focus:ring-2 focus:ring-green-400 focus:outline-none"
               />
               {errors.last_name && (
                 <p className="text-sm text-red-600">{errors.last_name}</p>
@@ -497,7 +507,7 @@ const Register = () => {
                 placeholder="Email *"
                 value={formData.email}
                 onChange={handleChange}
-                className="w-full rounded-lg border px-3 py-2"
+                className="w-full rounded-lg border border-gray-300 px-3 py-2 text-gray-900 shadow-sm focus:border-green-500 focus:ring-2 focus:ring-green-400 focus:outline-none"
               />
               {errors.email && <p className="text-sm text-red-600">{errors.email}</p>}
 
@@ -509,12 +519,12 @@ const Register = () => {
                   placeholder="Password *"
                   value={formData.password}
                   onChange={handlePasswordChange}
-                  className="w-full rounded-lg border px-3 py-2 pr-10"
+                  className="w-full rounded-lg border px-3 py-2 pr-10 border-gray-300 text-gray-900 shadow-sm focus:border-green-500 focus:ring-2 focus:ring-green-400 focus:outline-none"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword((s) => !s)}
-                  className="absolute right-2 top-2 text-gray-500"
+                  className="absolute right-2 top-3 text-gray-500"
                 >
                   {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                 </button>
@@ -530,12 +540,12 @@ const Register = () => {
                   placeholder="Confirm Password *"
                   value={formData.password2}
                   onChange={handlePasswordChange}
-                  className="w-full rounded-lg border px-3 py-2 pr-10"
+                  className="w-full rounded-lg border px-3 py-2 pr-10 border-gray-300 text-gray-900 shadow-sm focus:border-green-500 focus:ring-2 focus:ring-green-400 focus:outline-none"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword2((s) => !s)}
-                  className="absolute right-2 top-2 text-gray-500"
+                  className="absolute right-2 top-3 text-gray-500"
                 >
                   {showPassword2 ? <EyeOff size={18} /> : <Eye size={18} />}
                 </button>
@@ -592,7 +602,7 @@ const Register = () => {
                     placeholder="Phone Number *"
                     value={formData.phone_number}
                     onChange={handlePhoneNumberChange}
-                    className="w-full rounded-lg border px-3 py-2"
+                    className="w-full rounded-lg border border-gray-300 px-3 py-2 text-gray-900 shadow-sm focus:border-green-500 focus:ring-2 focus:ring-green-400 focus:outline-none"
                     inputMode="numeric"
                   />
                   {errors.phone_number && (
@@ -857,17 +867,16 @@ const Register = () => {
 
               {step === 6 && (
                 <>
-                  <label className="text-xs text-gray-600 flex justify-end">
-                    <span className="mr-auto text-sm">Bio (required)</span>
+                  <label className="text-xs text-gray-600 flex justify-end"><span className="mr-auto text-sm">Bio</span>
                     <span>{formData.tenant.bio.length}/200</span>
                   </label>
                   <textarea
                     name="tenant.bio"
-                    placeholder="Bio (max 200 chars) *"
+                    placeholder="I am Wailee, i own..."
                     maxLength={200}
                     value={formData.tenant.bio}
                     onChange={handleTenantBioChange}
-                    className="w-full rounded-lg border px-3 py-2"
+                    className="w-full rounded-lg border border-gray-300 px-3 py-3 text-gray-900 shadow-sm focus:border-green-500 focus:ring-2 focus:ring-green-400 focus:outline-none"
                   />
                   {errors["tenant.bio"] && (
                     <p className="text-sm text-red-600">{errors["tenant.bio"]}</p>
@@ -888,7 +897,7 @@ const Register = () => {
                     placeholder="Phone Number *"
                     value={formData.landlord.phone_number}
                     onChange={handleLandlordPhoneChange}
-                    className="w-full rounded-lg border px-3 py-2"
+                    className="w-full rounded-lg border border-gray-300 px-3 py-2 text-gray-900 shadow-sm focus:border-green-500 focus:ring-2 focus:ring-green-400 focus:outline-none"
                     inputMode="numeric"
                   />
                   {errors["landlord.phone_number"] && (
@@ -900,17 +909,16 @@ const Register = () => {
               {step === 5 && (
                 <>
                   <label className="text-xs text-gray-600 flex justify-end">
-                    <span className="mr-auto text-sm">Property Name (required)</span>
                     <span>{formData.landlord.property_name.length}/50</span>
                   </label>
                   <input
                     type="text"
                     name="landlord.property_name"
-                    placeholder="Property Name (max 50 chars) *"
+                    placeholder="Property Name  *"
                     maxLength={50}
                     value={formData.landlord.property_name}
                     onChange={handlePropertyNameChange}
-                    className="w-full rounded-lg border px-3 py-2"
+                    className="w-full rounded-lg border border-gray-300 px-3 py-2 text-gray-900 shadow-sm focus:border-green-500 focus:ring-2 focus:ring-green-400 focus:outline-none"
                   />
                   {errors["landlord.property_name"] && (
                     <p className="text-sm text-red-600">{errors["landlord.property_name"]}</p>
@@ -922,7 +930,7 @@ const Register = () => {
                     placeholder="Years of Experience *"
                     value={formData.landlord.years_experience}
                     onChange={handleChange}
-                    className="w-full rounded-lg border px-3 py-2"
+                    className="w-full rounded-lg border border-gray-300 px-3 py-2 text-gray-900 shadow-sm focus:border-green-500 focus:ring-2 focus:ring-green-400 focus:outline-none"
                   />
                   {errors["landlord.years_experience"] && (
                     <p className="text-sm text-red-600">{errors["landlord.years_experience"]}</p>
@@ -932,31 +940,31 @@ const Register = () => {
 
               {step === 6 && (
                 <>
-                  <label className="block text-sm text-gray-600">Website (required)</label>
+                  <label className="block text-sm text-gray-600">Website </label>
                   <input
                     type="text"
                     name="landlord.website"
-                    placeholder="https://example.com *"
+                    placeholder="https://holo.com"
                     value={formData.landlord.website}
                     onChange={handleWebsiteChange}
-                    className="w-full rounded-lg border px-3 py-2"
+                    className="w-full rounded-lg border border-gray-300 px-3 py-2 text-gray-900 shadow-sm focus:border-green-500 focus:ring-2 focus:ring-green-400 focus:outline-none"
                   />
                   {errors["landlord.website"] && (
                     <p className="text-sm text-red-600">{errors["landlord.website"]}</p>
                   )}
 
                   <label className="text-xs text-gray-600 flex justify-end">
-                    <span className="mr-auto text-sm">Location (required)</span>
+                    <span className="mr-auto text-sm">Location</span>
                     <span>{formData.landlord.location.length}/50</span>
                   </label>
                   <input
                     type="text"
                     name="landlord.location"
-                    placeholder="Location (max 50 chars) *"
+                    placeholder="Abuja"
                     maxLength={50}
                     value={formData.landlord.location}
                     onChange={handleLocationChange}
-                    className="w-full rounded-lg border px-3 py-2"
+                    className="w-full rounded-lg border border-gray-300 px-3 py-2 text-gray-900 shadow-sm focus:border-green-500 focus:ring-2 focus:ring-green-400 focus:outline-none"
                   />
                   {errors["landlord.location"] && (
                     <p className="text-sm text-red-600">{errors["landlord.location"]}</p>
@@ -967,16 +975,16 @@ const Register = () => {
               {step === 7 && (
                 <>
                   <label className="text-xs text-gray-600 flex justify-end">
-                    <span className="mr-auto text-sm">Bio (required)</span>
+                    <span className="mr-auto text-sm">Bio</span>
                     <span>{formData.landlord.bio.length}/200</span>
                   </label>
                   <textarea
                     name="landlord.bio"
-                    placeholder="Bio (max 200 chars) *"
+                    placeholder="I am Wailee, i own..."
                     maxLength={200}
                     value={formData.landlord.bio}
                     onChange={handleLandlordBioChange}
-                    className="w-full rounded-lg border px-3 py-2"
+                    className="w-full rounded-lg border border-gray-300 px-3 py-3 text-gray-900 shadow-sm focus:border-green-500 focus:ring-2 focus:ring-green-400 focus:outline-none"
                   />
                   {errors["landlord.bio"] && (
                     <p className="text-sm text-red-600">{errors["landlord.bio"]}</p>
