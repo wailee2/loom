@@ -3,6 +3,8 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { Eye, EyeOff } from "lucide-react";
+import TenantRegister from "../components/Register/TenantRegister";
+import LandlordRegister from "../components/Register/LandlordRegister";
 
 const Register = () => {
   const { register } = useAuth();
@@ -32,12 +34,10 @@ const Register = () => {
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showPassword2, setShowPassword2] = useState(false);
-
-  // NEW: birthday picker state (keeps logic outside untouched)
-  const [bpView, setBpView] = useState("day"); // 'day' | 'month' | 'year'
-  const [bpMonth, setBpMonth] = useState(new Date().getMonth()); // 0..11
+  const [bpView, setBpView] = useState("day"); 
+  const [bpMonth, setBpMonth] = useState(new Date().getMonth());
   const [bpYear, setBpYear] = useState(new Date().getFullYear());
-  const [bpSelected, setBpSelected] = useState(null); // Date object or null
+  const [bpSelected, setBpSelected] = useState(new Date());
 
   // compute maxStep based on selected role
   const maxStep = formData.user_type === "landlord" ? 8 : 7;
@@ -128,7 +128,7 @@ const Register = () => {
   // Password fields: use normal handleChange but prevent super-long strings (optional)
   const handlePasswordChange = (e) => {
     // limit to 256 chars to be safe
-    const val = e.target.value.slice(0, 256);
+    const val = e.target.value.slice(0, 25);
     setFormData((prev) => ({ ...prev, [e.target.name]: val }));
   };
 
@@ -588,51 +588,42 @@ const Register = () => {
                       {/* LEFT: Calendar */}
                       <div className="w-full lg:w-2/3 bg-white rounded-md p-3 shadow-sm">
                         {/* Top Header: day month year (clickable) */}
-                        <div className="flex items-center justify-between mb-3">
+                        <div className="flex flex-col items-center justify-between mb-3 ">
                           <div className="flex gap-3 items-center">
                             <button
                               type="button"
                               onClick={() => setBpView("day")}
-                              className={`text-left px-2 py-1 rounded-md ${
+                              className={`text-left text-sm px-2 py-1 rounded-md ${
                                 bpView === "day"
                                   ? "bg-green-600 text-white"
                                   : "text-gray-700 hover:bg-gray-100"
                               }`}
                             >
-                              <div className="text-sm">Day</div>
-                              <div className="text-xs text-gray-500">
-                                {bpSelected ? `${bpSelected.getDate()}` : "--"}
-                              </div>
+                              Day
                             </button>
 
                             <button
                               type="button"
                               onClick={() => setBpView("month")}
-                              className={`text-left px-2 py-1 rounded-md ${
+                              className={`text-left text-sm px-2 py-1 rounded-md ${
                                 bpView === "month"
                                   ? "bg-green-600 text-white"
                                   : "text-gray-700 hover:bg-gray-100"
                               }`}
                             >
-                              <div className="text-sm">Month</div>
-                              <div className="text-xs text-gray-500">
-                                {bpSelected ? monthNames[bpSelected.getMonth()] : "--"}
-                              </div>
+                              Month
                             </button>
 
                             <button
                               type="button"
                               onClick={() => setBpView("year")}
-                              className={`text-left px-2 py-1 rounded-md ${
+                              className={`text-left text-sm px-2 py-1 rounded-md ${
                                 bpView === "year"
                                   ? "bg-green-600 text-white"
                                   : "text-gray-700 hover:bg-gray-100"
                               }`}
                             >
-                              <div className="text-sm">Year</div>
-                              <div className="text-xs text-gray-500">
-                                {bpSelected ? bpSelected.getFullYear() : "--"}
-                              </div>
+                              Year
                             </button>
                           </div>
 
@@ -764,14 +755,14 @@ const Register = () => {
                           <div className="text-sm text-gray-500 mb-1">Please select your birthday</div>
                           <div className="flex items-baseline gap-3">
                             <div className="text-4xl font-extrabold">
-                              {bpSelected ? bpSelected.getDate() : "--"}
+                              {bpSelected.getDate()}
                             </div>
                             <div>
                               <div className="text-2xl font-bold">
-                                {bpSelected ? bpSelected.toLocaleDateString(undefined, { weekday: 'long' }) : "Day"}
+                                {bpSelected.toLocaleDateString(undefined, { weekday: "long" })}
                               </div>
                               <div className="text-sm text-gray-600">
-                                {bpSelected ? `${monthNames[bpSelected.getMonth()]}, ${bpSelected.getFullYear()}` : "Month, Year"}
+                                {monthNames[bpSelected.getMonth()]}, {bpSelected.getFullYear()}
                               </div>
                             </div>
                           </div>
