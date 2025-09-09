@@ -423,7 +423,12 @@ const Register = () => {
   // Render
   return (
     <div className="flex min-h-screen items-center justify-center bg-pink-300 px-4">
-      <div className={`w-full ${step === 5 ? 'max-w-4xl' : 'max-w-2xl'} rounded-2xl bg-blue-700 p-8 shadow-lg`}>
+      <div
+        className={`w-full ${
+            step === 5 ? 'max-w-4xl' : step === maxStep ? 'max-w-2xl' : 'max-w-xl'
+          } rounded-2xl bg-blue-700 p-8 shadow-lg`
+        }
+      >
         {/* Progress Bar */}
         <div className="mb-6 h-2 w-full rounded-full bg-gray-200">
           <div
@@ -1016,8 +1021,11 @@ const Register = () => {
           )}
         </form>
 
-        {/* Step navigation */}
-        <div className="mt-6 flex justify-between">
+        {/* Step navigation - hidden if in step 5 for tenant*/}
+        
+        <div
+          className={`mt-6 flex justify-between ${formData.user_type === "tenant" && step === 5 ? "hidden" : ""}`}
+        >
           {step > 1 && step < maxStep && (
             <button
               onClick={handleBack}
@@ -1035,6 +1043,7 @@ const Register = () => {
             </button>
           )}
         </div>
+
       </div>
     </div>
   );
