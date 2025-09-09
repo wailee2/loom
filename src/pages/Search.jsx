@@ -1,78 +1,62 @@
-// src/pages/Dashboard.jsx
+// src/pages/Search.jsx
 import React, { useState } from "react";
 import { useAuth } from "../context/AuthContext";
-import { useNavigate, Link, useNavigate as useRouterNavigate } from "react-router-dom";
-import { LucideSearch } from "lucide-react";
+import { getProfileByUsername } from "../api/accounts"; // import your API functions
+import SearchResults from "./SearchResults";
 
-const Dashboard = () => {
-  const { user, logout } = useAuth();
-  const navigate = useNavigate();
-  const [searchQuery, setSearchQuery] = useState("");
+const Search = () => {
+  const { accessToken } = useAuth();
+  const [query, setQuery] = useState("");
+  const [results, setResults] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
-  if (!user) {
-    navigate("/login");
-    return null;
-  }
-
-  const handleSearch = (e) => {
+  const handleSearch = async (e) => {
     e.preventDefault();
-    if (!searchQuery) return;
-    // Navigate to /profile/:username dynamically
-    navigate(`/profile/${searchQuery}`);
-    setSearchQuery("");
+    if (!query) return;
+
+    try {
+      setLoading(true);
+      setError(null);
+      // For simplicity, assume searching by exact username.
+      const profile = await getProfileByUsername(query, accessToken);
+      setResults([profile]); // Wrap in array for SearchResults
+    } catch (err) {
+      setError(err.message);
+      setResults([]);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
-    <div className="p-6">
-      <h1 className="text-2xl font-bold mb-4">
-        Welcome, {user?.first_name || user?.email}
-      </h1>
-
-      <div className="flex gap-4 mb-6 flex-wrap">
-        {/* Logout Button */}
-        <button
-          className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 transition"
-          onClick={logout}
-        >
-          Logout
-        </button>
-
-        {/* Link to Profile Page */}
-        <Link
-          to="/profile"
-          className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition"
-        >
-          Go to Profile
-        </Link>
-
-        {/* Link to Search Page */}
-        <Link
-          to="/search"
-          className="flex items-center px-4 py-2 bg-gray-700 text-white rounded hover:bg-gray-800 transition"
-        >
-          <LucideSearch className="w-5 h-5 mr-2" />
-          Search Users
-        </Link>
-      </div>
-
-      {/* Inline Quick Search */}
-      <form onSubmit={handleSearch} className="flex max-w-md mb-4">
+    <div className="max-w-2xl mx-auto p-4">
+      <form onSubmit={handleSearch} className="flex mb-4">
         <input
           type="text"
           placeholder="Search by username..."
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
           className="flex-1 p-2 border border-gray-300 rounded-l-md focus:outline-none"
         />
         <button
           type="submit"
-          className="px-4 py-2 bg-gray-700 text-white rounded-r-md hover:bg-gray-800 flex items-center"
+          className="px-4 py-2 bg-green-500 text-white rounded-r-md hover:bg-green-600"
         >
-          <LucideSearch className="w-5 h-5" />
+          Search
         </button>
       </form>
+
+      {loading && <p>Searching...</p>}
+      {error && <p className="text-red-500">{error}</p>}
+      {!loading && !error && results.length > 0 && (
+        <SearchResults results={results} />
+      )}
+      {!loading && !error && results.length === 0 && query && (
+        <p>No users found.</p>
+      )}
     </div>
   );
 };
 
-export default Dashboard;
+export default Search;
