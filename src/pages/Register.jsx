@@ -33,6 +33,9 @@ const Register = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showPassword2, setShowPassword2] = useState(false);
 
+  // compute maxStep based on selected role
+  const maxStep = formData.user_type === "landlord" ? 8 : 7;
+
   // general handleChange keeps your logic intact
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -123,15 +126,17 @@ const Register = () => {
     setFormData((prev) => ({ ...prev, [e.target.name]: val }));
   };
 
-  // step validation - updated for website required & changed max lengths/requirements
+  // step validation - updated for new step mapping
   const validateStep = () => {
     let newErrors = {};
 
+    // STEP 1: Names
     if (step === 1) {
       if (!formData.first_name) newErrors.first_name = "First name is required";
       if (!formData.last_name) newErrors.last_name = "Last name is required";
     }
 
+    // STEP 2: Email + Password
     if (step === 2) {
       if (!formData.email) newErrors.email = "Email is required";
 
@@ -154,69 +159,89 @@ const Register = () => {
       }
     }
 
-    // role selection (optional check)
+    // STEP 3: Role selection
     if (step === 3) {
       if (!formData.user_type) newErrors.user_type = "Role is required";
     }
 
-    if (step === 4 && formData.user_type === "tenant") {
-      if (!formData.phone_number) {
-        newErrors.phone_number = "Phone number is required";
-      } else if (!/^\d{1,11}$/.test(formData.phone_number)) {
-        newErrors.phone_number =
-          "Phone number must be numbers only, max 11 digits";
+    // TENANT FLOW
+    if (formData.user_type === "tenant") {
+      if (step === 4) {
+        if (!formData.phone_number) {
+          newErrors.phone_number = "Phone number is required";
+        } else if (!/^\d{1,11}$/.test(formData.phone_number)) {
+          newErrors.phone_number =
+            "Phone number must be numbers only, max 11 digits";
+        }
       }
 
-      if (!formData.tenant.date_of_birth) {
-        newErrors["tenant.date_of_birth"] = "Date of birth is required";
+      if (step === 5) {
+        if (!formData.tenant.date_of_birth) {
+          newErrors["tenant.date_of_birth"] = "Date of birth is required";
+        }
       }
 
-      if (!formData.tenant.bio) {
-        newErrors["tenant.bio"] = "Bio is required";
-      } else if (formData.tenant.bio.length > 200) {
-        newErrors["tenant.bio"] = "Bio cannot exceed 200 characters";
+      if (step === 6) {
+        if (!formData.tenant.bio) {
+          newErrors["tenant.bio"] = "Bio is required";
+        } else if (formData.tenant.bio.length > 200) {
+          newErrors["tenant.bio"] = "Bio cannot exceed 200 characters";
+        }
       }
+
+      // step 7 is confirmation for tenant — no extra checks here
     }
 
-    if (step === 4 && formData.user_type === "landlord") {
-      if (!formData.landlord.phone_number) {
-        newErrors["landlord.phone_number"] = "Phone number is required";
-      } else if (!/^\d{1,11}$/.test(formData.landlord.phone_number)) {
-        newErrors["landlord.phone_number"] =
-          "Phone number must be numbers only, max 11 digits";
+    // LANDLORD FLOW
+    if (formData.user_type === "landlord") {
+      if (step === 4) {
+        if (!formData.landlord.phone_number) {
+          newErrors["landlord.phone_number"] = "Phone number is required";
+        } else if (!/^\d{1,11}$/.test(formData.landlord.phone_number)) {
+          newErrors["landlord.phone_number"] =
+            "Phone number must be numbers only, max 11 digits";
+        }
       }
 
-      if (!formData.landlord.property_name) {
-        newErrors["landlord.property_name"] = "Property name is required";
-      } else if (formData.landlord.property_name.length > 50) {
-        newErrors["landlord.property_name"] =
-          "Property name cannot exceed 50 characters";
+      if (step === 5) {
+        if (!formData.landlord.property_name) {
+          newErrors["landlord.property_name"] = "Property name is required";
+        } else if (formData.landlord.property_name.length > 50) {
+          newErrors["landlord.property_name"] =
+            "Property name cannot exceed 50 characters";
+        }
+
+        if (!formData.landlord.years_experience) {
+          newErrors["landlord.years_experience"] =
+            "Years of experience is required";
+        }
       }
 
-      if (!formData.landlord.years_experience) {
-        newErrors["landlord.years_experience"] =
-          "Years of experience is required";
+      if (step === 6) {
+        // website and location required on step 6 for landlord per your mapping
+        if (!formData.landlord.location) {
+          newErrors["landlord.location"] = "Location is required";
+        } else if (formData.landlord.location.length > 50) {
+          newErrors["landlord.location"] = "Location cannot exceed 50 characters";
+        }
+
+        if (!formData.landlord.website) {
+          newErrors["landlord.website"] = "Website is required";
+        } else if (!/^https?:\/\/.+/.test(formData.landlord.website)) {
+          newErrors["landlord.website"] =
+            "Website must be a valid URL starting with http:// or https://";
+        }
       }
 
-      // website is mandatory now and must start with http(s)://
-      if (!formData.landlord.website) {
-        newErrors["landlord.website"] = "Website is required";
-      } else if (!/^https?:\/\/.+/.test(formData.landlord.website)) {
-        newErrors["landlord.website"] =
-          "Website must be a valid URL starting with http:// or https://";
+      if (step === 7) {
+        if (!formData.landlord.bio) {
+          newErrors["landlord.bio"] = "Bio is required";
+        } else if (formData.landlord.bio.length > 200) {
+          newErrors["landlord.bio"] = "Bio cannot exceed 200 characters";
+        }
       }
 
-      if (!formData.landlord.bio) {
-        newErrors["landlord.bio"] = "Bio is required";
-      } else if (formData.landlord.bio.length > 200) {
-        newErrors["landlord.bio"] = "Bio cannot exceed 200 characters";
-      }
-
-      if (!formData.landlord.location) {
-        newErrors["landlord.location"] = "Location is required";
-      } else if (formData.landlord.location.length > 50) {
-        newErrors["landlord.location"] = "Location cannot exceed 50 characters";
-      }
+      // step 8 is confirmation for landlord — no extra checks here
     }
 
     setErrors(newErrors);
@@ -226,7 +251,8 @@ const Register = () => {
   // go to next step
   const handleNext = () => {
     if (validateStep()) {
-      setStep((s) => s + 1);
+      // ensure we don't go past computed maxStep (in case role changed)
+      setStep((s) => Math.min(s + 1, maxStep));
     }
   };
 
@@ -280,7 +306,7 @@ const Register = () => {
         <div className="mb-6 h-2 w-full rounded-full bg-gray-200">
           <div
             className="h-2 rounded-full bg-green-500 transition-all duration-500"
-            style={{ width: `${(step / 5) * 100}%` }}
+            style={{ width: `${(step / maxStep) * 100}%` }}
           />
         </div>
 
@@ -377,159 +403,209 @@ const Register = () => {
             </>
           )}
 
-          {/* STEP 3: Role */}
+          {/* STEP 3: Role selection (buttons) */}
           {step === 3 && (
-            <select
-              name="user_type"
-              value={formData.user_type}
-              onChange={handleChange}
-              className="w-full rounded-lg border px-3 py-2"
-            >
-              <option value="tenant">Tenant</option>
-              <option value="landlord">Landlord</option>
-            </select>
+            <div className="flex gap-4">
+              <button
+                type="button"
+                onClick={() =>
+                  setFormData((prev) => ({ ...prev, user_type: "tenant" }))
+                }
+                className={`flex-1 rounded-lg border px-4 py-3 font-medium ${
+                  formData.user_type === "tenant"
+                    ? "bg-green-600 text-white"
+                    : "bg-white text-gray-700"
+                }`}
+              >
+                Tenant
+              </button>
+              <button
+                type="button"
+                onClick={() =>
+                  setFormData((prev) => ({ ...prev, user_type: "landlord" }))
+                }
+                className={`flex-1 rounded-lg border px-4 py-3 font-medium ${
+                  formData.user_type === "landlord"
+                    ? "bg-green-600 text-white"
+                    : "bg-white text-gray-700"
+                }`}
+              >
+                Landlord
+              </button>
+              {errors.user_type && (
+                <p className="text-sm text-red-600">{errors.user_type}</p>
+              )}
+            </div>
           )}
 
-          {/* STEP 4: Role-specific fields */}
-          {step === 4 && formData.user_type === "tenant" && (
+          {/* ROLE-SPECIFIC FLOW: TENANT */}
+          {formData.user_type === "tenant" && (
             <>
-              <input
-                type="tel"
-                name="phone_number"
-                placeholder="Phone Number *"
-                value={formData.phone_number}
-                onChange={handlePhoneNumberChange}
-                className="w-full rounded-lg border px-3 py-2"
-                inputMode="numeric"
-              />
-              {errors.phone_number && (
-                <p className="text-sm text-red-600">{errors.phone_number}</p>
+              {step === 4 && (
+                <>
+                  <input
+                    type="tel"
+                    name="phone_number"
+                    placeholder="Phone Number *"
+                    value={formData.phone_number}
+                    onChange={handlePhoneNumberChange}
+                    className="w-full rounded-lg border px-3 py-2"
+                    inputMode="numeric"
+                  />
+                  {errors.phone_number && (
+                    <p className="text-sm text-red-600">{errors.phone_number}</p>
+                  )}
+                </>
               )}
 
-              <input
-                type="date"
-                name="tenant.date_of_birth"
-                value={formData.tenant.date_of_birth}
-                onChange={handleChange}
-                className="w-full rounded-lg border px-3 py-2"
-              />
-              {errors["tenant.date_of_birth"] && (
-                <p className="text-sm text-red-600">{errors["tenant.date_of_birth"]}</p>
+              {step === 5 && (
+                <>
+                  <input
+                    type="date"
+                    name="tenant.date_of_birth"
+                    value={formData.tenant.date_of_birth}
+                    onChange={handleChange}
+                    className="w-full rounded-lg border px-3 py-2"
+                  />
+                  {errors["tenant.date_of_birth"] && (
+                    <p className="text-sm text-red-600">{errors["tenant.date_of_birth"]}</p>
+                  )}
+                </>
               )}
 
-              <label className="text-xs text-gray-600 flex justify-end">
-                <span className="mr-auto text-sm">Bio (required)</span>
-                <span>{formData.tenant.bio.length}/200</span>
-              </label>
-              <textarea
-                name="tenant.bio"
-                placeholder="Bio (max 200 chars) *"
-                maxLength={200}
-                value={formData.tenant.bio}
-                onChange={handleTenantBioChange}
-                className="w-full rounded-lg border px-3 py-2"
-              />
-              {errors["tenant.bio"] && (
-                <p className="text-sm text-red-600">{errors["tenant.bio"]}</p>
+              {step === 6 && (
+                <>
+                  <label className="text-xs text-gray-600 flex justify-end">
+                    <span className="mr-auto text-sm">Bio (required)</span>
+                    <span>{formData.tenant.bio.length}/200</span>
+                  </label>
+                  <textarea
+                    name="tenant.bio"
+                    placeholder="Bio (max 200 chars) *"
+                    maxLength={200}
+                    value={formData.tenant.bio}
+                    onChange={handleTenantBioChange}
+                    className="w-full rounded-lg border px-3 py-2"
+                  />
+                  {errors["tenant.bio"] && (
+                    <p className="text-sm text-red-600">{errors["tenant.bio"]}</p>
+                  )}
+                </>
               )}
             </>
           )}
 
-          {step === 4 && formData.user_type === "landlord" && (
+          {/* ROLE-SPECIFIC FLOW: LANDLORD */}
+          {formData.user_type === "landlord" && (
             <>
-              <input
-                type="tel"
-                name="landlord.phone_number"
-                placeholder="Phone Number *"
-                value={formData.landlord.phone_number}
-                onChange={handleLandlordPhoneChange}
-                className="w-full rounded-lg border px-3 py-2"
-                inputMode="numeric"
-              />
-              {errors["landlord.phone_number"] && (
-                <p className="text-sm text-red-600">{errors["landlord.phone_number"]}</p>
+              {step === 4 && (
+                <>
+                  <input
+                    type="tel"
+                    name="landlord.phone_number"
+                    placeholder="Phone Number *"
+                    value={formData.landlord.phone_number}
+                    onChange={handleLandlordPhoneChange}
+                    className="w-full rounded-lg border px-3 py-2"
+                    inputMode="numeric"
+                  />
+                  {errors["landlord.phone_number"] && (
+                    <p className="text-sm text-red-600">{errors["landlord.phone_number"]}</p>
+                  )}
+                </>
               )}
 
-              <label className="text-xs text-gray-600 flex justify-end">
-                <span className="mr-auto text-sm">Property Name (required)</span>
-                <span>{formData.landlord.property_name.length}/50</span>
-              </label>
-              <input
-                type="text"
-                name="landlord.property_name"
-                placeholder="Property Name (max 50 chars) *"
-                maxLength={50}
-                value={formData.landlord.property_name}
-                onChange={handlePropertyNameChange}
-                className="w-full rounded-lg border px-3 py-2"
-              />
-              {errors["landlord.property_name"] && (
-                <p className="text-sm text-red-600">{errors["landlord.property_name"]}</p>
+              {step === 5 && (
+                <>
+                  <label className="text-xs text-gray-600 flex justify-end">
+                    <span className="mr-auto text-sm">Property Name (required)</span>
+                    <span>{formData.landlord.property_name.length}/50</span>
+                  </label>
+                  <input
+                    type="text"
+                    name="landlord.property_name"
+                    placeholder="Property Name (max 50 chars) *"
+                    maxLength={50}
+                    value={formData.landlord.property_name}
+                    onChange={handlePropertyNameChange}
+                    className="w-full rounded-lg border px-3 py-2"
+                  />
+                  {errors["landlord.property_name"] && (
+                    <p className="text-sm text-red-600">{errors["landlord.property_name"]}</p>
+                  )}
+
+                  <input
+                    type="number"
+                    name="landlord.years_experience"
+                    placeholder="Years of Experience *"
+                    value={formData.landlord.years_experience}
+                    onChange={handleChange}
+                    className="w-full rounded-lg border px-3 py-2"
+                  />
+                  {errors["landlord.years_experience"] && (
+                    <p className="text-sm text-red-600">{errors["landlord.years_experience"]}</p>
+                  )}
+                </>
               )}
 
-              <input
-                type="number"
-                name="landlord.years_experience"
-                placeholder="Years of Experience *"
-                value={formData.landlord.years_experience}
-                onChange={handleChange}
-                className="w-full rounded-lg border px-3 py-2"
-              />
-              {errors["landlord.years_experience"] && (
-                <p className="text-sm text-red-600">{errors["landlord.years_experience"]}</p>
+              {step === 6 && (
+                <>
+                  <label className="block text-sm text-gray-600">Website (required)</label>
+                  <input
+                    type="text"
+                    name="landlord.website"
+                    placeholder="https://example.com *"
+                    value={formData.landlord.website}
+                    onChange={handleWebsiteChange}
+                    className="w-full rounded-lg border px-3 py-2"
+                  />
+                  {errors["landlord.website"] && (
+                    <p className="text-sm text-red-600">{errors["landlord.website"]}</p>
+                  )}
+
+                  <label className="text-xs text-gray-600 flex justify-end">
+                    <span className="mr-auto text-sm">Location (required)</span>
+                    <span>{formData.landlord.location.length}/50</span>
+                  </label>
+                  <input
+                    type="text"
+                    name="landlord.location"
+                    placeholder="Location (max 50 chars) *"
+                    maxLength={50}
+                    value={formData.landlord.location}
+                    onChange={handleLocationChange}
+                    className="w-full rounded-lg border px-3 py-2"
+                  />
+                  {errors["landlord.location"] && (
+                    <p className="text-sm text-red-600">{errors["landlord.location"]}</p>
+                  )}
+                </>
               )}
 
-              <label className="block text-sm text-gray-600">Website (required)</label>
-              <input
-                type="text"
-                name="landlord.website"
-                placeholder="https://example.com *"
-                value={formData.landlord.website}
-                onChange={handleWebsiteChange}
-                className="w-full rounded-lg border px-3 py-2"
-                // not using native type=url because we restrict characters ourselves and final validation checks protocol
-              />
-              {errors["landlord.website"] && (
-                <p className="text-sm text-red-600">{errors["landlord.website"]}</p>
-              )}
-
-              <label className="text-xs text-gray-600 flex justify-end">
-                <span className="mr-auto text-sm">Bio (required)</span>
-                <span>{formData.landlord.bio.length}/200</span>
-              </label>
-              <textarea
-                name="landlord.bio"
-                placeholder="Bio (max 200 chars) *"
-                maxLength={200}
-                value={formData.landlord.bio}
-                onChange={handleLandlordBioChange}
-                className="w-full rounded-lg border px-3 py-2"
-              />
-              {errors["landlord.bio"] && (
-                <p className="text-sm text-red-600">{errors["landlord.bio"]}</p>
-              )}
-
-              <label className="text-xs text-gray-600 flex justify-end">
-                <span className="mr-auto text-sm">Location (required)</span>
-                <span>{formData.landlord.location.length}/50</span>
-              </label>
-              <input
-                type="text"
-                name="landlord.location"
-                placeholder="Location (max 50 chars) *"
-                maxLength={50}
-                value={formData.landlord.location}
-                onChange={handleLocationChange}
-                className="w-full rounded-lg border px-3 py-2"
-              />
-              {errors["landlord.location"] && (
-                <p className="text-sm text-red-600">{errors["landlord.location"]}</p>
+              {step === 7 && (
+                <>
+                  <label className="text-xs text-gray-600 flex justify-end">
+                    <span className="mr-auto text-sm">Bio (required)</span>
+                    <span>{formData.landlord.bio.length}/200</span>
+                  </label>
+                  <textarea
+                    name="landlord.bio"
+                    placeholder="Bio (max 200 chars) *"
+                    maxLength={200}
+                    value={formData.landlord.bio}
+                    onChange={handleLandlordBioChange}
+                    className="w-full rounded-lg border px-3 py-2"
+                  />
+                  {errors["landlord.bio"] && (
+                    <p className="text-sm text-red-600">{errors["landlord.bio"]}</p>
+                  )}
+                </>
               )}
             </>
           )}
 
-          {/* STEP 5: Confirmation */}
-          {step === 5 && (
+          {/* CONFIRMATION: tenant (step 7) or landlord (step 8) -> render when step === maxStep */}
+          {step === maxStep && (
             <div className="space-y-4">
               <h2 className="text-lg font-semibold text-gray-700">
                 Confirm Your Details
@@ -604,18 +680,18 @@ const Register = () => {
 
         {/* Step navigation */}
         <div className="mt-6 flex justify-between">
-          {step > 1 && step < 5 && (
+          {step > 1 && step < maxStep && (
             <button
               onClick={handleBack}
               className="rounded-lg bg-gray-200 px-4 py-2 text-sm font-medium text-gray-700"
             >
-              Back.this 
+              Back
             </button>
           )}
-          {step < 5 && (
+          {step < maxStep && (
             <button
               onClick={handleNext}
-              className="rounded-lg bg-green-600 px-4 py-2 text-sm font-medium text-white"
+              className="ml-auto rounded-lg bg-green-600 px-4 py-2 text-sm font-medium text-white"
             >
               Next
             </button>
