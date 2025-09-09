@@ -1,5 +1,5 @@
 // src/pages/Register.jsx
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { Eye, EyeOff } from "lucide-react";
@@ -32,6 +32,12 @@ const Register = () => {
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showPassword2, setShowPassword2] = useState(false);
+
+  // NEW: birthday picker state (keeps logic outside untouched)
+  const [bpView, setBpView] = useState("day"); // 'day' | 'month' | 'year'
+  const [bpMonth, setBpMonth] = useState(new Date().getMonth()); // 0..11
+  const [bpYear, setBpYear] = useState(new Date().getFullYear());
+  const [bpSelected, setBpSelected] = useState(null); // Date object or null
 
   // compute maxStep based on selected role
   const maxStep = formData.user_type === "landlord" ? 8 : 7;
@@ -124,6 +130,86 @@ const Register = () => {
     // limit to 256 chars to be safe
     const val = e.target.value.slice(0, 256);
     setFormData((prev) => ({ ...prev, [e.target.name]: val }));
+  };
+
+  // Initialize birthday picker from formData if present
+  useEffect(() => {
+    const dob = formData.tenant?.date_of_birth;
+    if (dob) {
+      // expect YYYY-MM-DD
+      const parts = dob.split("-");
+      if (parts.length === 3) {
+        const y = parseInt(parts[0], 10);
+        const m = parseInt(parts[1], 10) - 1;
+        const d = parseInt(parts[2], 10);
+        const dt = new Date(y, m, d);
+        if (!isNaN(dt)) {
+          setBpSelected(dt);
+          setBpMonth(m);
+          setBpYear(y);
+        }
+      }
+    }
+  }, [formData.tenant.date_of_birth]);
+
+  // Helper: format YYYY-MM-DD
+  const formatISO = (d) => {
+    if (!d) return "";
+    const y = d.getFullYear();
+    const m = `${d.getMonth() + 1}`.padStart(2, "0");
+    const day = `${d.getDate()}`.padStart(2, "0");
+    return `${y}-${m}-${day}`;
+  };
+
+  // Helper: get days in month
+  const daysInMonth = (y, m) => new Date(y, m + 1, 0).getDate();
+
+  // Helper: first day index (0 = Sunday)
+  const firstDayIndex = (y, m) => new Date(y, m, 1).getDay();
+
+  // Click a day in calendar
+  const handlePickDay = (day) => {
+    const d = new Date(bpYear, bpMonth, day);
+    setBpSelected(d);
+    // set into formData tenant.date_of_birth as YYYY-MM-DD
+    setFormData((prev) => ({
+      ...prev,
+      tenant: { ...prev.tenant, date_of_birth: formatISO(d) },
+    }));
+  };
+
+  // Navigate months
+  const handlePrevMonth = () => {
+    let m = bpMonth - 1;
+    let y = bpYear;
+    if (m < 0) {
+      m = 11;
+      y -= 1;
+    }
+    setBpMonth(m);
+    setBpYear(y);
+  };
+  const handleNextMonth = () => {
+    let m = bpMonth + 1;
+    let y = bpYear;
+    if (m > 11) {
+      m = 0;
+      y += 1;
+    }
+    setBpMonth(m);
+    setBpYear(y);
+  };
+
+  // When selecting month from month view
+  const handleSelectMonth = (m) => {
+    setBpMonth(m);
+    setBpView("day");
+  };
+
+  // When selecting year from year view
+  const handleSelectYear = (y) => {
+    setBpYear(y);
+    setBpView("month");
   };
 
   // step validation - updated for new step mapping
@@ -318,6 +404,23 @@ const Register = () => {
     }
   };
 
+  // month names
+  const monthNames = [
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December",
+  ];
+
+  // Render
   return (
     <div className="flex min-h-screen items-center justify-center bg-gray-50 px-4">
       <div className="w-full max-w-xl rounded-2xl bg-white p-8 shadow-lg">
@@ -479,16 +582,241 @@ const Register = () => {
 
               {step === 5 && (
                 <>
-                  <input
-                    type="date"
-                    name="tenant.date_of_birth"
-                    value={formData.tenant.date_of_birth}
-                    onChange={handleChange}
-                    className="w-full rounded-lg border px-3 py-2"
-                  />
-                  {errors["tenant.date_of_birth"] && (
-                    <p className="text-sm text-red-600">{errors["tenant.date_of_birth"]}</p>
-                  )}
+                  {/* MODERN BIRTHDAY PICKER - START */}
+                  <div className="border-2 border-green-500 rounded-xl p-4">
+                    <div className="flex flex-col lg:flex-row gap-4">
+                      {/* LEFT: Calendar */}
+                      <div className="w-full lg:w-2/3 bg-white rounded-md p-3 shadow-sm">
+                        {/* Top Header: day month year (clickable) */}
+                        <div className="flex items-center justify-between mb-3">
+                          <div className="flex gap-3 items-center">
+                            <button
+                              type="button"
+                              onClick={() => setBpView("day")}
+                              className={`text-left px-2 py-1 rounded-md ${
+                                bpView === "day"
+                                  ? "bg-green-600 text-white"
+                                  : "text-gray-700 hover:bg-gray-100"
+                              }`}
+                            >
+                              <div className="text-sm">Day</div>
+                              <div className="text-xs text-gray-500">
+                                {bpSelected ? `${bpSelected.getDate()}` : "--"}
+                              </div>
+                            </button>
+
+                            <button
+                              type="button"
+                              onClick={() => setBpView("month")}
+                              className={`text-left px-2 py-1 rounded-md ${
+                                bpView === "month"
+                                  ? "bg-green-600 text-white"
+                                  : "text-gray-700 hover:bg-gray-100"
+                              }`}
+                            >
+                              <div className="text-sm">Month</div>
+                              <div className="text-xs text-gray-500">
+                                {bpSelected ? monthNames[bpSelected.getMonth()] : "--"}
+                              </div>
+                            </button>
+
+                            <button
+                              type="button"
+                              onClick={() => setBpView("year")}
+                              className={`text-left px-2 py-1 rounded-md ${
+                                bpView === "year"
+                                  ? "bg-green-600 text-white"
+                                  : "text-gray-700 hover:bg-gray-100"
+                              }`}
+                            >
+                              <div className="text-sm">Year</div>
+                              <div className="text-xs text-gray-500">
+                                {bpSelected ? bpSelected.getFullYear() : "--"}
+                              </div>
+                            </button>
+                          </div>
+
+                          {/* Month and Year with arrows */}
+                          <div className="flex items-center gap-3">
+                            <button
+                              type="button"
+                              onClick={handlePrevMonth}
+                              className="rounded-full p-2 hover:bg-gray-100"
+                              aria-label="Previous"
+                            >
+                              ←
+                            </button>
+                            <div className="px-3 py-1 rounded-md text-sm font-medium">
+                              {monthNames[bpMonth]} {bpYear}
+                            </div>
+                            <button
+                              type="button"
+                              onClick={handleNextMonth}
+                              className="rounded-full p-2 hover:bg-gray-100"
+                              aria-label="Next"
+                            >
+                              →
+                            </button>
+                          </div>
+                        </div>
+
+                        {/* Calendar Body */}
+                        <div>
+                          {bpView === "day" && (
+                            <div>
+                              <div className="grid grid-cols-7 gap-2 text-xs text-center text-gray-500 mb-2">
+                                {["Sun","Mon","Tue","Wed","Thu","Fri","Sat"].map((d) => (
+                                  <div key={d}>{d}</div>
+                                ))}
+                              </div>
+
+                              <div className="grid grid-cols-7 gap-2">
+                                {/* empty slots */}
+                                {Array.from({ length: firstDayIndex(bpYear, bpMonth) }).map((_, i) => (
+                                  <div key={`e${i}`} className="h-10" />
+                                ))}
+
+                                {/* days */}
+                                {Array.from({ length: daysInMonth(bpYear, bpMonth) }).map((_, idx) => {
+                                  const day = idx + 1;
+                                  const selected =
+                                    bpSelected &&
+                                    bpSelected.getFullYear() === bpYear &&
+                                    bpSelected.getMonth() === bpMonth &&
+                                    bpSelected.getDate() === day;
+                                  return (
+                                    <button
+                                      key={day}
+                                      type="button"
+                                      onClick={() => handlePickDay(day)}
+                                      className={`h-10 rounded-md flex items-center justify-center text-sm font-medium hover:bg-gray-100 ${
+                                        selected ? "bg-green-600 text-white" : "text-gray-700"
+                                      }`}
+                                    >
+                                      {day}
+                                    </button>
+                                  );
+                                })}
+                              </div>
+                            </div>
+                          )}
+
+                          {bpView === "month" && (
+                            <div className="grid grid-cols-3 gap-2">
+                              {monthNames.map((m, i) => (
+                                <button
+                                  key={m}
+                                  type="button"
+                                  onClick={() => handleSelectMonth(i)}
+                                  className={`px-3 py-2 rounded-md text-sm font-medium hover:bg-gray-100 ${
+                                    bpMonth === i ? "bg-green-600 text-white" : "text-gray-700"
+                                  }`}
+                                >
+                                  {m.slice(0, 3)}
+                                </button>
+                              ))}
+                            </div>
+                          )}
+
+                          {bpView === "year" && (
+                            <div className="grid grid-cols-4 gap-2">
+                              {Array.from({ length: 12 }).map((_, i) => {
+                                const yearStart = bpYear - 5;
+                                const y = yearStart + i;
+                                return (
+                                  <button
+                                    key={y}
+                                    type="button"
+                                    onClick={() => handleSelectYear(y)}
+                                    className={`px-3 py-2 rounded-md text-sm font-medium hover:bg-gray-100 ${
+                                      bpYear === y ? "bg-green-600 text-white" : "text-gray-700"
+                                    }`}
+                                  >
+                                    {y}
+                                  </button>
+                                );
+                              })}
+                              {/* quick controls to shift year range */}
+                              <div className="col-span-4 flex justify-between mt-2">
+                                <button
+                                  type="button"
+                                  onClick={() => setBpYear((y) => y - 12)}
+                                  className="px-3 py-1 rounded-md text-sm hover:bg-gray-100"
+                                >
+                                  ← Prev range
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => setBpYear((y) => y + 12)}
+                                  className="px-3 py-1 rounded-md text-sm hover:bg-gray-100"
+                                >
+                                  Next range →
+                                </button>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* RIGHT: Preview + controls */}
+                      <div className="w-full lg:w-1/3 bg-gray-50 rounded-md p-4 flex flex-col justify-between">
+                        <div>
+                          <div className="text-sm text-gray-500 mb-1">Please select your birthday</div>
+                          <div className="flex items-baseline gap-3">
+                            <div className="text-4xl font-extrabold">
+                              {bpSelected ? bpSelected.getDate() : "--"}
+                            </div>
+                            <div>
+                              <div className="text-2xl font-bold">
+                                {bpSelected ? bpSelected.toLocaleDateString(undefined, { weekday: 'long' }) : "Day"}
+                              </div>
+                              <div className="text-sm text-gray-600">
+                                {bpSelected ? `${monthNames[bpSelected.getMonth()]}, ${bpSelected.getFullYear()}` : "Month, Year"}
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="mt-4 flex gap-3">
+                          <button
+                            type="button"
+                            onClick={handleBack}
+                            className="flex-1 rounded-lg bg-gray-300 px-4 py-2 font-semibold text-gray-700 hover:bg-gray-400"
+                          >
+                            Back
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              // ensure date saved already (bpSelected -> formData)
+                              if (bpSelected) {
+                                setFormData((prev) => ({
+                                  ...prev,
+                                  tenant: { ...prev.tenant, date_of_birth: formatISO(bpSelected) },
+                                }));
+                                // proceed to next step using your logic
+                                handleNext();
+                              } else {
+                                // set error for UX (won't change your validation logic)
+                                setErrors((prev) => ({
+                                  ...prev,
+                                  ["tenant.date_of_birth"]: "Please select your date of birth",
+                                }));
+                              }
+                            }}
+                            className="flex-1 rounded-lg bg-green-600 px-4 py-2 font-semibold text-white hover:bg-green-700"
+                          >
+                            Next
+                          </button>
+                        </div>
+
+                        {errors["tenant.date_of_birth"] && (
+                          <p className="mt-2 text-sm text-red-600">{errors["tenant.date_of_birth"]}</p>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                  {/* MODERN BIRTHDAY PICKER - END */}
                 </>
               )}
 
