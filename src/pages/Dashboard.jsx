@@ -63,7 +63,7 @@ const Dashboard = () => {
           Search Users
         </Link>
 
-        <Link to="/landlords" className="text-blue-600 hover:underline">
+        <Link to="/landlords" className="flex items-center px-4 py-2 bg-gray-700 text-white rounded hover:bg-gray-800 transition">
           View Landlords
         </Link>
       </div>
