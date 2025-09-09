@@ -1,4 +1,4 @@
-// src/pages/SearchResults.jsx
+// pages/SearchResults.jsx
 import React from "react";
 import { Link } from "react-router-dom";
 
