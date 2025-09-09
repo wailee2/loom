@@ -1,5 +1,5 @@
 // src/pages/Register.jsx
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { Eye, EyeOff } from "lucide-react";
@@ -34,10 +34,25 @@ const Register = () => {
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showPassword2, setShowPassword2] = useState(false);
-  const [bpView, setBpView] = useState("day"); 
+  const [bpView, setBpView] = useState("year"); 
   const [bpMonth, setBpMonth] = useState(new Date().getMonth());
   const [bpYear, setBpYear] = useState(new Date().getFullYear());
   const [bpSelected, setBpSelected] = useState(new Date());
+  const [bgStyle, setBgStyle] = useState({ width: 0, left: 0 });
+
+  const dayRef = useRef(null);
+  const monthRef = useRef(null);
+  const yearRef = useRef(null);
+  useEffect(() => {
+    let ref;
+    if (bpView === "day") ref = dayRef.current;
+    else if (bpView === "month") ref = monthRef.current;
+    else if (bpView === "year") ref = yearRef.current;
+
+    if (ref) {
+      setBgStyle({ width: ref.offsetWidth, left: ref.offsetLeft });
+    }
+  }, [bpView]);
 
   // compute maxStep based on selected role
   const maxStep = formData.user_type === "landlord" ? 8 : 7;
@@ -426,7 +441,7 @@ const Register = () => {
       <div
         className={`w-full ${
             step === 5 ? 'max-w-4xl' : step === maxStep ? 'max-w-2xl' : 'max-w-xl'
-          } rounded-2xl bg-blue-700 p-8 shadow-lg`
+          } rounded-2xl bg-white p-8 shadow-lg`
         }
       >
         {/* Progress Bar */}
@@ -588,231 +603,243 @@ const Register = () => {
               {step === 5 && (
                 <>
                   {/* BIRTHDAY PICKER*/}
-                  <div className="border-2 border-green-500 rounded-xl bg-amber-400 p-4">
-                    <div className="flex flex-col lg:flex-row gap-4">
-                      {/* LEFT: Calendar */}
-                      <div className="w-full lg:w-2/3 bg-green-300 rounded-md p-3 shadow-sm">
-                        {/* Top Header: day month year (clickable) */}
-                        <div className="flex flex-col items-center justify-between mb-3 ">
-                          <div className="flex gap-3 items-center">
-                            <button
-                              type="button"
-                              onClick={() => setBpView("day")}
-                              className={`text-left text-sm px-2 py-1 rounded-md ${
-                                bpView === "day"
-                                  ? "bg-green-600 text-white"
-                                  : "text-gray-700 hover:bg-gray-100"
-                              }`}
-                            >
-                              Day
-                            </button>
+                  <div className="flex bgorange-400 p-4 rounded-xl flex-col lg:flex-row gap-6 relative">
+                    {/* LEFT: Calendar */}
+                    <div className="w-full lg:w-[50%] bg-grmeen-300 roundemd-md pm-3 shadomw-sm">
+                      {/*Day Month and Year  */}
+                      <div
+                        className="
+                          bg-green-200/60 
+                          border border-white/25
+                          backdrop-blur-sm  
+                          relative py-1.5 text-lg rounded-xl flex gap-3 items-center justify-center  w-full
+                        "
+                      >
+                      {/* Sliding background */}
+                      <div
+                        className="absolute bg-white rounded-md transition-all duration-300"
+                        style={{
+                          width: bgStyle.width,
+                          left: bgStyle.left,
+                          height: "70%", // adjust this as needed
+                          top: "15%",    // centers it vertically with spacing above and below
+                        }}
+                      />
 
-                            <button
-                              type="button"
-                              onClick={() => setBpView("month")}
-                              className={`text-left text-sm px-2 py-1 rounded-md ${
-                                bpView === "month"
-                                  ? "bg-green-600 text-white"
-                                  : "text-gray-700 hover:bg-gray-100"
-                              }`}
-                            >
-                              Month
-                            </button>
+                      {/* Buttons */}
+                      <button
+                        ref={dayRef}
+                        type="button"
+                        onClick={() => setBpView("day")}
+                        className={`relative px-4 py-1 rounded-md  text-left text-lg transition-colors duration-300 ${
+                          bpView === "day" ? "text-green-600 font-semibold" : "text-gray-600"
+                        }`}
+                      >
+                        Day
+                      </button>
 
-                            <button
-                              type="button"
-                              onClick={() => setBpView("year")}
-                              className={`text-left text-sm px-2 py-1 rounded-md ${
-                                bpView === "year"
-                                  ? "bg-green-600 text-white"
-                                  : "text-gray-700 hover:bg-gray-100"
-                              }`}
-                            >
-                              Year
-                            </button>
-                          </div>
+                      <button
+                        ref={monthRef}
+                        type="button"
+                        onClick={() => setBpView("month")}
+                        className={`relative px-4 py-1 rounded-md text-left transition-colors duration-300 ${
+                          bpView === "month" ? "text-green-600 font-semibold" : "text-gray-600"
+                        }`}
+                      >
+                        Month
+                      </button>
 
-                          {/* Month and Year with arrows */}
-                          <div className="flex items-center gap-3">
-                            <button
-                              type="button"
-                              onClick={handlePrevMonth}
-                              className="rounded-full p-2 hover:bg-gray-100"
-                              aria-label="Previous"
-                            >
-                              ←
-                            </button>
-                            <div className="px-3 py-1 rounded-md text-sm font-medium">
-                              {monthNames[bpMonth]} {bpYear}
-                            </div>
-                            <button
-                              type="button"
-                              onClick={handleNextMonth}
-                              className="rounded-full p-2 hover:bg-gray-100"
-                              aria-label="Next"
-                            >
-                              →
-                            </button>
-                          </div>
+                      <button
+                        ref={yearRef}
+                        type="button"
+                        onClick={() => setBpView("year")}
+                        className={`relative px-4 py-1 rounded-md text-left transition-colors duration-300 ${
+                          bpView === "year" ? "text-green-600 font-semibold" : "text-gray-600"
+                        }`}
+                      >
+                        Year
+                      </button>
+                    </div>
+
+
+                      {/* Month and Year with arrows */}
+                      <div className="flex items-center justify-center gap-3">
+                        <button
+                          type="button"
+                          onClick={handlePrevMonth}
+                          className="rounded-full p-2 hover:bg-gray-100"
+                          aria-label="Previous"
+                        >
+                          ←
+                        </button>
+                        <div className="px-3 py-1 rounded-md text-sm font-medium">
+                          {monthNames[bpMonth]} {bpYear}
                         </div>
+                        <button
+                          type="button"
+                          onClick={handleNextMonth}
+                          className="rounded-full p-2 hover:bg-gray-100"
+                          aria-label="Next"
+                        >
+                          →
+                        </button>
+                      </div>
 
-                        {/* Calendar Body */}
-                        <div>
-                          {bpView === "day" && (
-                            <div>
-                              <div className="grid grid-cols-7 gap-2 text-xs text-center text-gray-500 mb-2">
-                                {["Sun","Mon","Tue","Wed","Thu","Fri","Sat"].map((d) => (
-                                  <div key={d}>{d}</div>
-                                ))}
-                              </div>
-
-                              <div className="grid grid-cols-7 gap-2">
-                                {/* empty slots */}
-                                {Array.from({ length: firstDayIndex(bpYear, bpMonth) }).map((_, i) => (
-                                  <div key={`e${i}`} className="h-10" />
-                                ))}
-
-                                {/* days */}
-                                {Array.from({ length: daysInMonth(bpYear, bpMonth) }).map((_, idx) => {
-                                  const day = idx + 1;
-                                  const selected =
-                                    bpSelected &&
-                                    bpSelected.getFullYear() === bpYear &&
-                                    bpSelected.getMonth() === bpMonth &&
-                                    bpSelected.getDate() === day;
-                                  return (
-                                    <button
-                                      key={day}
-                                      type="button"
-                                      onClick={() => handlePickDay(day)}
-                                      className={`h-10 rounded-md flex items-center justify-center text-sm font-medium hover:bg-gray-100 ${
-                                        selected ? "bg-green-600 text-white" : "text-gray-700"
-                                      }`}
-                                    >
-                                      {day}
-                                    </button>
-                                  );
-                                })}
-                              </div>
-                            </div>
-                          )}
-
-                          {bpView === "month" && (
-                            <div className="grid grid-cols-3 gap-2">
-                              {monthNames.map((m, i) => (
-                                <button
-                                  key={m}
-                                  type="button"
-                                  onClick={() => handleSelectMonth(i)}
-                                  className={`px-3 py-2 rounded-md text-sm font-medium hover:bg-gray-100 ${
-                                    bpMonth === i ? "bg-green-600 text-white" : "text-gray-700"
-                                  }`}
-                                >
-                                  {m.slice(0, 3)}
-                                </button>
+                      {/* Calendar Body */}
+                      <div>
+                        {bpView === "day" && (
+                          <div>
+                            <div className="grid grid-cols-7 gap-2 text-xs text-center text-gray-500 mb-2">
+                              {["Sun","Mon","Tue","Wed","Thu","Fri","Sat"].map((d) => (
+                                <div key={d}>{d}</div>
                               ))}
                             </div>
-                          )}
 
-                          {bpView === "year" && (
-                            <div className="grid grid-cols-4 gap-2">
-                              {Array.from({ length: 12 }).map((_, i) => {
-                                const yearStart = bpYear - 5;
-                                const y = yearStart + i;
+                            <div className="grid grid-cols-7 gap-2">
+                              {/* empty slots */}
+                              {Array.from({ length: firstDayIndex(bpYear, bpMonth) }).map((_, i) => (
+                                <div key={`e${i}`} className="h-10" />
+                              ))}
+
+                              {/* days */}
+                              {Array.from({ length: daysInMonth(bpYear, bpMonth) }).map((_, idx) => {
+                                const day = idx + 1;
+                                const selected =
+                                  bpSelected &&
+                                  bpSelected.getFullYear() === bpYear &&
+                                  bpSelected.getMonth() === bpMonth &&
+                                  bpSelected.getDate() === day;
                                 return (
                                   <button
-                                    key={y}
+                                    key={day}
                                     type="button"
-                                    onClick={() => handleSelectYear(y)}
-                                    className={`px-3 py-2 rounded-md text-sm font-medium hover:bg-gray-100 ${
-                                      bpYear === y ? "bg-green-600 text-white" : "text-gray-700"
+                                    onClick={() => handlePickDay(day)}
+                                    className={`h-10 rounded-md flex items-center justify-center text-sm font-medium hover:bg-gray-100 ${
+                                      selected ? "bg-green-600 text-white" : "text-gray-700"
                                     }`}
                                   >
-                                    {y}
+                                    {day}
                                   </button>
                                 );
                               })}
-                              {/* quick controls to shift year range */}
-                              <div className="col-span-4 flex justify-between mt-2">
-                                <button
-                                  type="button"
-                                  onClick={() => setBpYear((y) => y - 12)}
-                                  className="px-3 py-1 rounded-md text-sm hover:bg-gray-100"
-                                >
-                                  ← Prev range
-                                </button>
-                                <button
-                                  type="button"
-                                  onClick={() => setBpYear((y) => y + 12)}
-                                  className="px-3 py-1 rounded-md text-sm hover:bg-gray-100"
-                                >
-                                  Next range →
-                                </button>
-                              </div>
-                            </div>
-                          )}
-                        </div>
-                      </div>
-
-                      {/* RIGHT: Preview + controls */}
-                      <div className="w-full lg:w-1/3 bg-gray-50 rounded-md p-4 flex flex-col justify-between">
-                        <div>
-                          <div className="text-sm text-gray-500 mb-1">Please select your birthday</div>
-                          <div className="flex items-baseline gap-3">
-                            <div className="text-4xl font-extrabold">
-                              {bpSelected.getDate()}
-                            </div>
-                            <div>
-                              <div className="text-2xl font-bold">
-                                {bpSelected.toLocaleDateString(undefined, { weekday: "long" })}
-                              </div>
-                              <div className="text-sm text-gray-600">
-                                {monthNames[bpSelected.getMonth()]}, {bpSelected.getFullYear()}
-                              </div>
                             </div>
                           </div>
-                        </div>
+                        )}
 
-                        <div className="mt-4 flex gap-3">
-                          <button
-                            type="button"
-                            onClick={handleBack}
-                            className="flex-1 rounded-lg bg-gray-300 px-4 py-2 font-semibold text-gray-700 hover:bg-gray-400"
-                          >
-                            Back
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => {
-                              // ensure date saved already (bpSelected -> formData)
-                              if (bpSelected) {
-                                setFormData((prev) => ({
-                                  ...prev,
-                                  tenant: { ...prev.tenant, date_of_birth: formatISO(bpSelected) },
-                                }));
-                                // proceed to next step using your logic
-                                handleNext();
-                              } else {
-                                // set error for UX (won't change your validation logic)
-                                setErrors((prev) => ({
-                                  ...prev,
-                                  ["tenant.date_of_birth"]: "Please select your date of birth",
-                                }));
-                              }
-                            }}
-                            className="flex-1 rounded-lg bg-green-600 px-4 py-2 font-semibold text-white hover:bg-green-700"
-                          >
-                            Next
-                          </button>
-                        </div>
+                        {bpView === "month" && (
+                          <div className="grid grid-cols-3 gap-2">
+                            {monthNames.map((m, i) => (
+                              <button
+                                key={m}
+                                type="button"
+                                onClick={() => handleSelectMonth(i)}
+                                className={`px-3 py-2 rounded-md text-sm font-medium hover:bg-gray-100 ${
+                                  bpMonth === i ? "bg-green-600 text-white" : "text-gray-700"
+                                }`}
+                              >
+                                {m.slice(0, 3)}
+                              </button>
+                            ))}
+                          </div>
+                        )}
 
-                        {errors["tenant.date_of_birth"] && (
-                          <p className="mt-2 text-sm text-red-600">{errors["tenant.date_of_birth"]}</p>
+                        {bpView === "year" && (
+                          <div className="grid grid-cols-4 gap-2">
+                            {Array.from({ length: 12 }).map((_, i) => {
+                              const yearStart = bpYear - 5;
+                              const y = yearStart + i;
+                              return (
+                                <button
+                                  key={y}
+                                  type="button"
+                                  onClick={() => handleSelectYear(y)}
+                                  className={`px-3 py-2 rounded-md text-sm font-medium hover:bg-gray-100 ${
+                                    bpYear === y ? "bg-green-600 text-white" : "text-gray-700"
+                                  }`}
+                                >
+                                  {y}
+                                </button>
+                              );
+                            })}
+                            {/* quick controls to shift year range */}
+                            <div className="col-span-4 flex justify-between mt-2">
+                              <button
+                                type="button"
+                                onClick={() => setBpYear((y) => y - 12)}
+                                className="px-3 py-1 rounded-md text-sm hover:bg-gray-100"
+                              >
+                                ← Prev range
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => setBpYear((y) => y + 12)}
+                                className="px-3 py-1 rounded-md text-sm hover:bg-gray-100"
+                              >
+                                Next range →
+                              </button>
+                            </div>
+                          </div>
                         )}
                       </div>
                     </div>
+
+                    {/* RIGHT: Preview + controls */}
+                    <div className="w-full lg:w-[50%] rounded-md p-4 flex flex-col flex-wrapx justify-between ">
+                      <div className="text-lg text-gray-800 mb-1">Please select your birthday</div>
+                      <div>
+                        <div className="flex flex-wrap items-baseline gap-3 text-[#1a1a1a]">
+                          <div className="flex flex-wrap items-baseline gap-3">
+                            <div className="text-5xl lg:text-7xl font-bold ">
+                              {bpSelected.getDate()}
+                            </div>
+                            <div className="text-4xl tracking-tight font-bold">
+                              {bpSelected.toLocaleDateString(undefined, { weekday: "long" })}
+                            </div>
+                          </div>
+                          
+                          <div className="text-2xl ">
+                            {monthNames[bpSelected.getMonth()]}, {bpSelected.getFullYear()}
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* NEXT AND BACK BUTTON */}
+                      <div className="mt-4 flex gap-3">
+                        <button
+                          type="button"
+                          onClick={handleBack}
+                          className="flex-1 rounded-lg bg-gray-300 px-4 py-3 font-semibold text-gray-700 hover:bg-gray-400 text-lg"
+                        >
+                          Back
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            if (bpSelected) {
+                              setFormData((prev) => ({
+                                ...prev,
+                                tenant: { ...prev.tenant, date_of_birth: formatISO(bpSelected) },
+                              }));
+                              handleNext();
+                            } else {
+                              setErrors((prev) => ({
+                                ...prev,
+                                ["tenant.date_of_birth"]: "Please select your date of birth",
+                              }));
+                            }
+                          }}
+                          className="flex-1 rounded-lg bg-green-600 px-4 py-3 font-semibold text-white hover:bg-green-700 text-lg"
+                        >
+                          Next
+                        </button>
+                      </div>
+
+                      {errors["tenant.date_of_birth"] && (
+                        <p className="mt-2 text-sm text-red-600">{errors["tenant.date_of_birth"]}</p>
+                      )}
+                    </div>
                   </div>
-                  {/* MODERN BIRTHDAY PICKER - END */}
+                  {/* BIRTHDAY PICKER - END */}
                 </>
               )}
 
