@@ -774,16 +774,16 @@ const Register = () => {
                               <button
                                 type="button"
                                 onClick={() => setBpYear((y) => y - 12)}
-                                className="px-3 py-1 rounded-md text-sm hover:bg-gray-100"
+                                className="px-3 py-1 rounded-md text-sm hover:bg-gray-100 flex items-center"
                               >
-                                ← Prev range
+                                <HiChevronLeft className="w-9 h-9 text-green-600" />Range
                               </button>
                               <button
                                 type="button"
                                 onClick={() => setBpYear((y) => y + 12)}
-                                className="px-3 py-1 rounded-md text-sm hover:bg-gray-100"
+                                className="px-3 py-1 rounded-md text-sm hover:bg-gray-100 flex items-center"
                               >
-                                Next range →
+                                Range<HiChevronRight className="w-9 h-9 text-green-600" />
                               </button>
                             </div>
                           </div>
