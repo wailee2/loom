@@ -1,7 +1,7 @@
 // components/Properties/PropertyDetails.jsx
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { getPropertyById } from "../../api/property";
+import { getPropertyById } from "../api/property";
 
 const PropertyDetails = () => {
   const { id } = useParams();

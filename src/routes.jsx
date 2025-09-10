@@ -10,7 +10,10 @@ import UserProfile from "./pages/UserProfile";
 import Search from "./pages/Search";
 import PageNotFound from "./pages/PageNotFound";
 import Landlords from "./pages/Landlords";
-import PropertiesPage from "./pages/PropertiesPage";
+import PropertiesPage from "./pages/PropertiesPage"
+import PropertyDetails from "./pages/PropertyDetails";
+import CreateProperty from "./pages/CreateProperty";
+import Rooms from "./pages/Rooms";
 import { useAuth } from "./context/AuthContext";
 
 const PrivateRoute = ({ children }) => {
@@ -66,8 +69,22 @@ const AppRoutes = () => {
           </PrivateRoute>
         }
       />
-      <Route path="/properties/*" element={<PropertiesPage />} />
-      
+      <Route path="/properties" element={<PropertiesPage />} />
+      <Route
+        path="/properties/:property_id"
+        element={<PropertyDetails />}
+      />
+      <Route
+        path="/properties/create"
+        element={
+          <PrivateRoute>
+            <CreateProperty />
+          </PrivateRoute>
+        }
+      />
+
+      <Route path="/rooms/:property_id" element={<Rooms />} />
+        
       <Route path="/page-not-found" element={<PageNotFound />} />
       <Route path="*" element={<PageNotFound />} />
     </Routes>

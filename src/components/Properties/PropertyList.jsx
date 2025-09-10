@@ -39,6 +39,12 @@ const PropertyList = () => {
             <p className="text-gray-600 mb-1">LocationPLIST: {property.location}</p>
             <p className="text-gray-600 mb-1">PricePLIST: ${property.price}</p>
             <p className="text-gray-500 text-sm">PLIST{property.description}</p>
+            <Link
+              to={`/rooms/${property.id}`} // link to rooms page from plist
+              className="mt-auto inline-block bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 transition"
+            >
+              View Rooms
+            </Link>
           </div>
         ))
       )}

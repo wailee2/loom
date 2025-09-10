@@ -3,8 +3,6 @@ import React from "react";
 import { Routes, Route, Link, Navigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import PropertyList from "../components/Properties/PropertyList";
-import CreateProperty from "../components/Properties/CreateProperty";
-import PropertyDetails from "../components/Properties/PropertyDetails";
 import HandleLoading from "../utils/HandleLoading";
 
 const PropertiesPage = () => {
@@ -38,41 +36,7 @@ const PropertiesPage = () => {
 
         {/* Main content */}
         <main className="p-6">
-          <Routes>
-            {/* Property list */}
-            <Route
-              path="/"
-              element={
-                <div className="space-y-6">
-                  <PropertyList />
-                </div>
-              }
-            />
-
-            {/* Property create - landlord only */}
-            <Route
-              path="create"
-              element={
-                isLandlord ? (
-                  <div className="space-y-6">
-                    <CreateProperty />
-                  </div>
-                ) : (
-                  <Navigate to="/properties" />
-                )
-              }
-            />
-
-            {/* Property details */}
-            <Route
-              path=":id"
-              element={
-                <div className="space-y-6">
-                  <PropertyDetails />
-                </div>
-              }
-            />
-          </Routes>
+          <PropertyList />hey
         </main>
       </div>
     </HandleLoading>
