@@ -1,22 +1,48 @@
-import React from "react";
+// components/Properties/PropertyList.jsx
+import React, { useEffect, useState } from "react";
+import { getAllProperties } from "../api/property";
 
-const PropertyList = ({ properties, onViewDetails }) => {
+const PropertyList = () => {
+  const [properties, setProperties] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchProperties = async () => {
+      try {
+        const data = await getAllProperties();
+        setProperties(data);
+      } catch (err) {
+        setError(err.message || "Failed to fetch properties");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProperties();
+  }, []);
+
+  if (loading) return <p>Loading properties...</p>;
+  if (error) return <p>Error: {error}</p>;
+
   return (
-    <ul className="space-y-2 mb-6">
-      {properties.map((prop) => (
-        <li key={prop.id} className="border p-3 rounded flex justify-between">
-          <span>
-            {prop.name} - {prop.location}
-          </span>
-          <button
-            className="text-blue-600 underline"
-            onClick={() => onViewDetails(prop.id)}
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 p-4">
+      {properties.length === 0 ? (
+        <p>No properties available.</p>
+      ) : (
+        properties.map((property) => (
+          <div
+            key={property.id}
+            className="border rounded-lg p-4 shadow hover:shadow-lg transition"
           >
-            View Details
-          </button>
-        </li>
-      ))}
-    </ul>
+            <h2 className="text-xl font-semibold mb-2">{property.name}</h2>
+            <p className="text-gray-600 mb-1">Location: {property.location}</p>
+            <p className="text-gray-600 mb-1">Price: ${property.price}</p>
+            <p className="text-gray-500 text-sm">{property.description}</p>
+          </div>
+        ))
+      )}
+    </div>
   );
 };
 
