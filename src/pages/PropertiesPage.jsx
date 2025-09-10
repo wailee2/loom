@@ -34,10 +34,19 @@ const PropertiesPage = () => {
             )}
           </nav>
         </header>
-
+        
         {/* Main content */}
         <main className="p-6">
           <PropertyList />hey
+
+          <Link
+            to="/properties/create"
+            className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition"
+          >
+            Create property
+          </Link>
+
+          
         </main>
       </div>
     </HandleLoading>

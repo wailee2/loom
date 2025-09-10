@@ -14,6 +14,7 @@ import PropertiesPage from "./pages/PropertiesPage"
 import PropertyDetails from "./pages/PropertyDetails";
 import CreateProperty from "./pages/CreateProperty";
 import Rooms from "./pages/Rooms";
+import RoomsPage from "./pages/RoomsPage";
 import AddRoom from "./pages/AddRoom";
 import { useAuth } from "./context/AuthContext";
 
@@ -71,10 +72,7 @@ const AppRoutes = () => {
         }
       />
       <Route path="/properties" element={<PropertiesPage />} />
-      <Route
-        path="/properties/:property_id"
-        element={<PropertyDetails />}
-      />
+      <Route path="/properties/:propertyid" element={<PropertyDetails />} />
       <Route
         path="/properties/create"
         element={
@@ -84,9 +82,10 @@ const AppRoutes = () => {
         }
       />
 
-      <Route path="/rooms" element={<Rooms />} />
+      <Route path="/rooms/:propertyid" element={<RoomsPage />} />
+
       <Route
-        path="/rooms/:property_id"
+        path="/rooms/:property_id/add-room"
         element={
           <PrivateRoute>
             <AddRoom />
