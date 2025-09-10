@@ -1,7 +1,7 @@
 // components/Properties/CreateProperty.jsx
 import React, { useState } from "react";
-import { createProperty } from "../api/property";
-import { useAuth } from "../context/AuthContext"; // assuming you have auth context for token
+import { createProperty } from "../../api/property";
+import { useAuth } from "../../context/AuthContext"; // assuming you have auth context for token
 
 const CreateProperty = () => {
   const { accessToken } = useAuth(); // landlord must be logged in

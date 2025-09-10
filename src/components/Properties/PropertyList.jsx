@@ -1,6 +1,6 @@
 // components/Properties/PropertyList.jsx
 import React, { useEffect, useState } from "react";
-import { getAllProperties } from "../api/property";
+import { getAllProperties } from "../../api/property";
 
 const PropertyList = () => {
   const [properties, setProperties] = useState([]);
