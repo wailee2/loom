@@ -84,9 +84,9 @@ const AppRoutes = () => {
         }
       />
 
-      <Route path="/rooms/:property_id" element={<Rooms />} />
+      <Route path="/rooms" element={<Rooms />} />
       <Route
-        path="/properties/:property_id/add-room"
+        path="/rooms/:property_id"
         element={
           <PrivateRoute>
             <AddRoom />
