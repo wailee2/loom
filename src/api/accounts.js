@@ -1,3 +1,4 @@
+// api/accounts.js
 const API_BASE = "https://greengrass-backend.onrender.com/api/accounts";
 
 export const getMyProfile = async (token) => {
