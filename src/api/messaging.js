@@ -35,7 +35,7 @@ export const startConversation = async (token, conversationData) => {
     );
     return response.data;
   } catch (error) {
-    console.error("Error starting conversation:", error);
+    console.error("Error starting conversation:", error.response?.data || error.message);
     throw error;
   }
 };
