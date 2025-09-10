@@ -68,7 +68,7 @@ const Dashboard = () => {
         </Link>
         <Link 
           to="/properties" 
-          className="text-gray-700 hover:text-green-600 px-3 py-2 text-sm font-medium transition-colors"
+          className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition"
         >
           properties
         </Link>

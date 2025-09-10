@@ -28,7 +28,7 @@ const PropertyList = () => {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 p-4">
       {properties.length === 0 ? (
-        <p>No properties available.</p>
+        <p>No propertiesPLIST available.</p>
       ) : (
         properties.map((property) => (
           <div
@@ -36,9 +36,9 @@ const PropertyList = () => {
             className="border rounded-lg p-4 shadow hover:shadow-lg transition"
           >
             <h2 className="text-xl font-semibold mb-2">{property.name}</h2>
-            <p className="text-gray-600 mb-1">Location: {property.location}</p>
-            <p className="text-gray-600 mb-1">Price: ${property.price}</p>
-            <p className="text-gray-500 text-sm">{property.description}</p>
+            <p className="text-gray-600 mb-1">LocationPLIST: {property.location}</p>
+            <p className="text-gray-600 mb-1">PricePLIST: ${property.price}</p>
+            <p className="text-gray-500 text-sm">PLIST{property.description}</p>
           </div>
         ))
       )}

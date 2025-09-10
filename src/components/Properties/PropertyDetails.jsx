@@ -33,9 +33,9 @@ const PropertyDetails = () => {
   return (
     <div className="max-w-3xl mx-auto p-6 bg-white rounded-lg shadow-lg">
       <h1 className="text-3xl font-bold mb-4">{property.name}</h1>
-      <p className="text-gray-700 mb-2"><strong>Location:</strong> {property.location}</p>
-      <p className="text-gray-700 mb-2"><strong>Price:</strong> ${property.price}</p>
-      <p className="text-gray-600 mb-4">{property.description}</p>
+      <p className="text-gray-700 mb-2"><strong>LocationPDETAIL:</strong> {property.location}</p>
+      <p className="text-gray-700 mb-2"><strong>Pricedeta:</strong> ${property.price}</p>
+      <p className="text-gray-600 mb-4">descrDETAIL{property.description}</p>
       {/* Add more fields if your API returns them, like images or amenities */}
     </div>
   );

@@ -44,12 +44,6 @@ const About = () => {
               register
             </Link>
             <Link 
-              to="/register" 
-              className="text-gray-700 hover:text-green-600 px-3 py-2 text-sm font-medium transition-colors"
-            >
-              register
-            </Link>
-            <Link 
               to="/properties" 
               className="text-gray-700 hover:text-green-600 px-3 py-2 text-sm font-medium transition-colors"
             >
