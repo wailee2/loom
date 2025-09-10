@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { getRoomsByProperty } from "../../api/room";
-import HandleLoading from ".././utils/HandleLoading";
+import HandleLoading from "../../utils/HandleLoading";
 
 const RoomList = () => {
   const { id } = useParams(); // property ID from URL

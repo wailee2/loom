@@ -7,6 +7,7 @@ import HandleLoading from "../utils/HandleLoading";
 
 const PropertiesPage = () => {
   const { user, loading } = useAuth();
+  
 
   const isLandlord = user?.role === "landlord";
 

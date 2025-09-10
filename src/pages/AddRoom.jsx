@@ -1,4 +1,4 @@
-// src/components/Room/AddRoom.jsx
+// pages/AddRoom.jsx
 import React, { useState } from "react";
 import { useParams } from "react-router-dom";
 import { addRoomToProperty } from "../api/room";
