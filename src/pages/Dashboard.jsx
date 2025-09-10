@@ -5,6 +5,7 @@ import { useNavigate, Link } from "react-router-dom";
 import { LucideSearch } from "lucide-react";
 import { getProfileByUsername } from "../api/accounts";
 import { useHandle404Redirect } from "../utils/handleErrors";
+import Conversations from "../components/Messaging/Conversations";
 
 const Dashboard = () => {
   const { user, logout, accessToken } = useAuth();
@@ -72,6 +73,13 @@ const Dashboard = () => {
         >
           properties
         </Link>
+        <Link 
+          to="/messages" 
+          className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition"
+        >
+          Messages
+        </Link>
+        
       </div>
 
       <form onSubmit={handleSearch} className="flex max-w-md mb-4">
