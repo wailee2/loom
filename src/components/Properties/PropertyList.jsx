@@ -1,5 +1,6 @@
 // components/Properties/PropertyList.jsx
 import React, { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import { getAllProperties } from "../../api/property";
 
 const PropertyList = () => {
