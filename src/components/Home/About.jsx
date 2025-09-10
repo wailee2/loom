@@ -49,6 +49,13 @@ const About = () => {
             >
               register
             </Link>
+            <Link 
+              to="/properties" 
+              className="text-gray-700 hover:text-green-600 px-3 py-2 text-sm font-medium transition-colors"
+            >
+              properties
+            </Link>
+            
             <p className="text-gray-600 mb-6 text-lg">
               We are transforming how people find, buy, and rent properties across Nigeria. 
               Our platform brings transparency, security, and convenience to the real estate market.
