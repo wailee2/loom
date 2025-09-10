@@ -66,6 +66,12 @@ const Dashboard = () => {
         <Link to="/landlords" className="flex items-center px-4 py-2 bg-gray-700 text-white rounded hover:bg-gray-800 transition">
           View Landlords
         </Link>
+        <Link 
+          to="/properties" 
+          className="text-gray-700 hover:text-green-600 px-3 py-2 text-sm font-medium transition-colors"
+        >
+          properties
+        </Link>
       </div>
 
       <form onSubmit={handleSearch} className="flex max-w-md mb-4">
