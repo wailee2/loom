@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
 import { useAuth } from "../context/AuthContext";
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import { FaBars, FaTimes, FaTachometerAlt, FaBuilding, FaComments, FaCog, FaLayerGroup } from "react-icons/fa";
 import { HiLogout } from "react-icons/hi";
 
@@ -16,6 +16,11 @@ const Sidebar = () => {
     const { logout } = useAuth();
     const [isOpen, setIsOpen] = useState(false);
     const sidebarRef = useRef(null);
+    const navigate = useNavigate();
+    const handleLogout = () => {
+        logout(); // perform logout
+        navigate("/login"); // redirect to login
+    };
 
   // Close sidebar when clicking outside (mobile overlay)
     useEffect(() => {
@@ -55,7 +60,7 @@ const Sidebar = () => {
         <div
             ref={sidebarRef}
             className={`
-                fixed top-0 left-0 h-full bg-white z-40 transform py-4 pl-4 pr-1
+                fixed top-0 left-0 h-full bg-white z-40 transform py-4 pl-4 pr-1.5
                 ${isOpen ? "translate-x-0" : "-translate-x-full"}
                 transition-transform duration-300 ease-in-out
                 md:translate-x-0 md:static 
@@ -96,11 +101,10 @@ const Sidebar = () => {
                 </nav>
                 <button
                     className="px-6 w-full transition-allk flex items-center justify-start gap-1.5 py-2.5 text-gray-500 hover:text-gray-800  group cursor-pointer "
-                    onClick={logout}
+                    onClick={handleLogout}
                     >
                         <HiLogout className="text-xl group-hover:text-green-700"/>
-                        <span className="text-xl hidden lg:inline"></span>
-                    Logout
+                        <span className="text-xl hidden lg:inline">Logout</span>
                 </button>
             </div>
         </div>

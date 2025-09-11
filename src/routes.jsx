@@ -11,7 +11,7 @@ import Search from "./pages/Search";
 import PageNotFound from "./pages/PageNotFound";
 import Landlords from "./pages/Landlords";
 import PropertiesPage from "./pages/PropertiesPage"
-import PropertyDetails from "./pages/PropertyDetails";
+import PropertyDetailPage from "./pages/PropertyDetailPage";
 import CreateProperty from "./pages/CreateProperty";
 import RoomsPage from "./pages/RoomsPage";
 import AddRoom from "./pages/AddRoom";
@@ -85,7 +85,7 @@ const AppRoutes = () => {
               }
             />
             <Route path="/properties" element={<PropertiesPage />} />
-            <Route path="/properties/:propertyid" element={<PropertyDetails />} />
+            <Route path="/properties/:id" element={<PropertyDetailPage />} />
             <Route
               path="/properties/create"
               element={
