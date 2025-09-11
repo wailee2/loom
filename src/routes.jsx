@@ -1,6 +1,6 @@
 // src/AppRoutes.jsx
 import React from "react";
-import { Routes, Route, Navigate } from "react-router-dom";
+import { Routes, Route, Navigate, useLocation } from "react-router-dom";
 import Home from "./pages/Home";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
@@ -17,6 +17,7 @@ import RoomsPage from "./pages/RoomsPage";
 import AddRoom from "./pages/AddRoom";
 import ErrorBoundary from "./components/ErrorBoundary";
 import Messages from "./pages/Messages";
+import Sidebar from "./components/Sidebar";
 import { useAuth } from "./context/AuthContext";
 
 const PrivateRoute = ({ children }) => {
@@ -27,79 +28,91 @@ const PrivateRoute = ({ children }) => {
 
 
 const AppRoutes = () => {
+  const location = useLocation();
+
+  // Pages where sidebar should NOT be shown
+  const noSidebarPages = ["/", "/login", "/register"];
+
+  const showSidebar = !noSidebarPages.includes(location.pathname);
   return (
     <ErrorBoundary>
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
-        <Route
-          path="/dashboard"
-          element={
-            <PrivateRoute>
-              <Dashboard />
-            </PrivateRoute>
-          }
-        />
-        <Route
-          path="/profile"
-          element={
-            <PrivateRoute>
-              <ProfilePage />
-            </PrivateRoute>
-          }
-        />
-        <Route
-          path="/profile/:username"
-          element={
-            <PrivateRoute>
-              <UserProfile />
-            </PrivateRoute>
-          }
-        />
-        <Route
-          path="/search"
-          element={
-            <PrivateRoute>
-              <Search />
-            </PrivateRoute>
-          }
-        />
-        <Route
-          path="/landlords"
-          element={
-            <PrivateRoute>
-              <Landlords />
-            </PrivateRoute>
-          }
-        />
-        <Route path="/properties" element={<PropertiesPage />} />
-        <Route path="/properties/:propertyid" element={<PropertyDetails />} />
-        <Route
-          path="/properties/create"
-          element={
-            <PrivateRoute>
-              <CreateProperty />
-            </PrivateRoute>
-          }
-        />
+      <div className="flex">
+        {showSidebar && <Sidebar />}
+        <main className="flex-1">
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
+            
+            <Route
+              path="/dashboard"
+              element={
+                <PrivateRoute>
+                  <Dashboard />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="/profile"
+              element={
+                <PrivateRoute>
+                  <ProfilePage />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="/profile/:username"
+              element={
+                <PrivateRoute>
+                  <UserProfile />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="/search"
+              element={
+                <PrivateRoute>
+                  <Search />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="/landlords"
+              element={
+                <PrivateRoute>
+                  <Landlords />
+                </PrivateRoute>
+              }
+            />
+            <Route path="/properties" element={<PropertiesPage />} />
+            <Route path="/properties/:propertyid" element={<PropertyDetails />} />
+            <Route
+              path="/properties/create"
+              element={
+                <PrivateRoute>
+                  <CreateProperty />
+                </PrivateRoute>
+              }
+            />
 
-        <Route path="/rooms/:propertyid" element={<RoomsPage />} />
+            <Route path="/rooms/:propertyid" element={<RoomsPage />} />
 
-        <Route
-          path="/rooms/:property_id/add-room"
-          element={
-            <PrivateRoute>
-              <AddRoom />
-            </PrivateRoute>
-          }
-        />
-        
-        <Route path="/messages" element={<Messages />} />
+            <Route
+              path="/rooms/:property_id/add-room"
+              element={
+                <PrivateRoute>
+                  <AddRoom />
+                </PrivateRoute>
+              }
+            />
+            
+            <Route path="/messages" element={<Messages />} />
 
-        <Route path="/page-not-found" element={<PageNotFound />} />
-        <Route path="*" element={<PageNotFound />} />
-      </Routes>
+            <Route path="/page-not-found" element={<PageNotFound />} />
+            <Route path="*" element={<PageNotFound />} />
+          </Routes>
+        </main>
+      </div>
     </ErrorBoundary>
   );
 };

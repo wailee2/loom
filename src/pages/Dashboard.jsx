@@ -2,10 +2,9 @@
 import React, { useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import { useNavigate, Link } from "react-router-dom";
-import { LucideSearch } from "lucide-react";
+import { LucideSearch, MessageCircle, NotepadTextIcon, PersonStanding } from "lucide-react";
 import { getProfileByUsername } from "../api/accounts";
 import { useHandle404Redirect } from "../utils/handleErrors";
-import Conversations from "../components/Messaging/Conversations";
 
 const Dashboard = () => {
   const { user, logout, accessToken } = useAuth();
@@ -36,10 +35,59 @@ const Dashboard = () => {
 
 
   return (
-    <div className="p-6">
-      <h1 className="text-2xl font-bold mb-4">
-        Welcome, {user?.first_name || user?.email}
-      </h1>
+    <div className="py-4 pr-4 pl-1.5 space-y-3 bg-white">
+      <header className="og-bg p-4 flex-wrap ">
+        {/*SEARCHBAR */}
+        <div>
+          <form onSubmit={handleSearch} className="flex max-w-[20rem] px-4 rounded-full bg-white   ">
+            <div
+              className="  text-gray-900 rounded-r-md   flex items-center"
+            >
+              <LucideSearch className="w-5 h-5" />
+            </div>
+            <input
+              type="text"
+              placeholder="Search by username..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="flex-1 py-3.5 px-3  bg-white  text-sm focus:outline-none"
+            /> 
+          </form>
+        </div>
+
+        <div className="flex justify-between items-center gap-3">
+          <Link 
+            to="/messages" 
+            className="p-3.5 bg-white rounded-full "
+          >
+            <MessageCircle className="w-5 h-5 text-gray-900" />
+          </Link>
+          <div className="p-3.5 bg-white rounded-full">
+            <NotepadTextIcon className="w-5 h-5 text-gray-900" />
+          </div>
+          <Link
+            to="/profile"
+            className="flex items-center justify-between group gap-3"
+          >
+            <div className="bg-white rounded-full p-6.5 group-hover:bg-gray-900 transition-all duration-800 linear"></div>
+            <div className="flex flex-col items-start">
+              <span className="text-[19px] font-semibold">
+                {user?.first_name}
+              </span>
+              <span className="text-sm text-gray-500">
+                {user?.email}
+              </span>
+            </div>
+          </Link>
+          
+        </div>
+      </header>
+
+      <main className="og-bg p-4">
+        <h1 className="text-4xl font-semibold">Dashboard</h1>
+      </main>
+
+      
 
       <div className="flex gap-4 mb-6 flex-wrap">
         <button
@@ -49,12 +97,7 @@ const Dashboard = () => {
           Logout
         </button>
 
-        <Link
-          to="/profile"
-          className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition"
-        >
-          Go to Profile
-        </Link>
+        
 
         <Link
           to="/search"
@@ -73,30 +116,11 @@ const Dashboard = () => {
         >
           properties
         </Link>
-        <Link 
-          to="/messages" 
-          className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition"
-        >
-          Messages
-        </Link>
+        
         
       </div>
 
-      <form onSubmit={handleSearch} className="flex max-w-md mb-4">
-        <input
-          type="text"
-          placeholder="Search by username..."
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          className="flex-1 p-2 border border-gray-300 rounded-l-md focus:outline-none"
-        />
-        <button
-          type="submit"
-          className="px-4 py-2 bg-gray-700 text-white rounded-r-md hover:bg-gray-800 flex items-center"
-        >
-          <LucideSearch className="w-5 h-5" />
-        </button>
-      </form>
+      
     </div>
   );
 };
