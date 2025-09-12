@@ -2,8 +2,6 @@
 import React from "react";
 import { useAuth } from "../context/AuthContext";
 import { useNavigate, Link } from "react-router-dom";
-import Header from "../components/Header";
-import { LucideSearch, MessageCircle, NotepadTextIcon } from "lucide-react";
 
 const Dashboard = () => {
   const { user } = useAuth();

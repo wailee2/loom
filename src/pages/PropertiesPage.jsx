@@ -1,7 +1,6 @@
 // src/pages/PropertiesPage.jsx
 import React from "react";
 import { Link } from "react-router-dom";
-import Header from "../components/Header";
 import { formatPrice } from "../utils/formatPrice";
 import { useProperties } from "../context/PropertyContext";
 import HandleLoading from "../utils/HandleLoading";

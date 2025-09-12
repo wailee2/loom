@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import Header from "../components/Header";
 import { useAuth } from "../context/AuthContext";
 import { getMyProfile } from "../api/accounts";
 import { useHandle404Redirect } from "../utils/handleErrors";
