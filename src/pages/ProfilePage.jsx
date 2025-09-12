@@ -42,8 +42,9 @@ const ProfilePage = () => {
             <div className="col-span-1 bg-white p-4 rounded-xl shadow flex flex-col justify-around items-center gap-4">
               <div className="flex justify-between items-center">
                 <span className="text-gray-900 font-semibold text-3xl">
-                  {profile.first_name} {profile.last_name}
-                </span>
+                {profile ? `${profile.first_name} ${profile.last_name}` : "Loading..."}
+              </span>
+
               </div>
               <div className="w-35 h-35 rounded-full bg-green-100 flex items-center justify-center text-green-600 text-xl font-bold border-3 border-gray-300">
                 {profile?.first_name?.[0]}
