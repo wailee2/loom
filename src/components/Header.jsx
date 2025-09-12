@@ -45,7 +45,7 @@ const Header = ({ handle404 }) => {
                 </form>
             </div>
             {user && (
-            <div className="flex justify-between items-center gap-3 mt-3">
+            <div className="flex justify-between items-center gap-3">
                 <Link to="/messages" className="p-3.5 bg-white rounded-full">
                 <MessageCircle className="w-5 h-5 text-gray-900" />
                 </Link>
@@ -60,7 +60,7 @@ const Header = ({ handle404 }) => {
                     >
                     <div className="bg-white rounded-full p-6.5 group-hover:bg-gray-900 transition-all duration-800 linear"></div>
                     <div className="hidden lg:block">
-                        <div className="flex flex-col items-start  ">
+                        <div className="flex flex-col items-start justify-center ">
                             <span className="text-[19px] font-semibold">
                                 {user?.first_name.length > 8
                                 ? `${user.first_name.slice(0, 8)}...`

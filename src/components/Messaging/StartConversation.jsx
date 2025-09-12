@@ -2,9 +2,8 @@ import React, { useState } from "react";
 import { useAuth } from "../../context/AuthContext";
 import { startConversation } from "../../api/messaging";
 
-const StartConversation = () => {
+const StartConversation = ({ propertyId }) => {
   const { accessToken } = useAuth();
-  const [recipient, setRecipient] = useState("");
   const [initialMessage, setInitialMessage] = useState("");
   const [status, setStatus] = useState(null);
 
@@ -14,13 +13,13 @@ const StartConversation = () => {
 
     try {
       const data = await startConversation(accessToken, {
-        recipient,       // Example: username or user_id
+        property_id: propertyId,   // 👈 important
         message: initialMessage,
       });
       setStatus(`Conversation started with ID: ${data.id}`);
-      setRecipient("");
       setInitialMessage("");
     } catch (err) {
+      console.error("Error starting conversation:", err);
       setStatus("Failed to start conversation. Try again.");
     }
   };
@@ -29,14 +28,6 @@ const StartConversation = () => {
     <div className="p-4 max-w-md mx-auto bg-white shadow rounded-xl">
       <h2 className="text-xl font-semibold mb-4">Start New Conversation</h2>
       <form onSubmit={handleSubmit} className="space-y-3">
-        <input
-          type="text"
-          value={recipient}
-          onChange={(e) => setRecipient(e.target.value)}
-          placeholder="Recipient username or ID"
-          className="w-full border rounded-lg p-2"
-          required
-        />
         <textarea
           value={initialMessage}
           onChange={(e) => setInitialMessage(e.target.value)}
@@ -57,5 +48,4 @@ const StartConversation = () => {
     </div>
   );
 };
-
 export default StartConversation;
