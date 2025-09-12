@@ -24,7 +24,7 @@ const PropertiesPage = () => {
               <TooltipProvider>
                 <Tooltip>
                   <TooltipTrigger asChild>
-                    <Info className="w-5 h-5 text-gray-600 cursor-pointer" />
+                    <Info className="mt-1.5 w-5 h-5 text-gray-600 cursor-pointer" />
                   </TooltipTrigger>
                   <TooltipContent>
                     <p>Browse and discover available properties here.</p>
