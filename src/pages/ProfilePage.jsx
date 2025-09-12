@@ -5,13 +5,21 @@ import { useHandle404Redirect } from "../utils/handleErrors";
 import HandleLoading from "../utils/HandleLoading";
 import { HiMail, HiPhone } from "react-icons/hi";
 import BioSection from "../components/Profile/BioSection";
+import { useNavigate } from "react-router-dom"; // <-- import useNavigate
 
 const ProfilePage = () => {
   const { accessToken, profile, setProfile } = useAuth();
   const [loading, setLoading] = useState(!profile);
   const handle404 = useHandle404Redirect();
+  const navigate = useNavigate(); // <-- initialize navigate
 
   useEffect(() => {
+    // Redirect immediately if not logged in
+    if (!accessToken) {
+      navigate("/login");
+      return;
+    }
+
     if (!profile && accessToken) {
       const fetchProfile = async () => {
         try {
@@ -28,9 +36,8 @@ const ProfilePage = () => {
     } else {
       setLoading(false);
     }
-  }, [accessToken, handle404, profile, setProfile]);
+  }, [accessToken, handle404, navigate, profile, setProfile]);
 
-  // If profile is null, we can show a friendly message or keep loading
   if (!profile && !loading) {
     return (
       <div className="p-6 text-center text-gray-500">
@@ -43,7 +50,6 @@ const ProfilePage = () => {
     <HandleLoading loading={loading}>
       <div className="og-bg og-p h-full flex flex-col gap-4">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          
           {/* Profile pic and name */}
           <div className="col-span-1 bg-white p-4 rounded-xl shadow flex flex-col justify-around items-center gap-4">
             <div className="flex justify-between items-center">
