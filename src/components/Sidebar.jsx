@@ -1,11 +1,12 @@
 import React, { useState, useRef, useEffect } from "react";
 import { useAuth } from "../context/AuthContext";
 import { NavLink, useNavigate } from "react-router-dom";
-import { FaBars, FaTimes, FaTachometerAlt, FaBuilding, FaComments, FaCog, FaLayerGroup } from "react-icons/fa";
+import { FaBars, FaTimes, FaTachometerAlt, FaBuilding, FaComments, FaCog, FaLayerGroup, FaUser } from "react-icons/fa";
 import { HiLogout } from "react-icons/hi";
 
 const links = [
     { name: "Dashboard", path: "/dashboard", icon: <FaTachometerAlt /> },
+    { name: "My profile", path: "/profile", icon: <FaUser /> },
     { name: "Properties", path: "/properties", icon: <FaBuilding /> },
     { name: "Landlords", path: "/landlords", icon: <FaLayerGroup /> },
     { name: "Messages", path: "/messages", icon: <FaComments /> },

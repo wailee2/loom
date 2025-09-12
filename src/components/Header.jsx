@@ -59,17 +59,13 @@ const Header = ({ handle404 }) => {
                     className="flex items-center justify-between group gap-3"
                     >
                     <div className="bg-white rounded-full p-6.5 group-hover:bg-gray-900 transition-all duration-800 linear"></div>
-                    <div className="hidden lg:block">
-                        <div className="flex flex-col items-start justify-center ">
-                            <span className="text-[19px] font-semibold">
-                                {user?.first_name.length > 8
-                                ? `${user.first_name.slice(0, 8)}...`
-                                : user.first_name}
+                    <div className="hidden md:block">
+                        <div className="flex flex-col items-start justify-center">
+                            <span className="text-[19px] font-semibold truncate max-w-[130px]">
+                            {user?.first_name}
                             </span>
-                            <span className="text-sm text-gray-500">
-                                {user?.email.length > 17
-                                ? `${user.email.slice(0, 17)}...`
-                                : user.email}
+                            <span className="text-sm text-gray-500 truncate max-w-[130px]">
+                            {user?.email}
                             </span>
                         </div>
                     </div>
