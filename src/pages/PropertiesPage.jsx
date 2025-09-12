@@ -15,11 +15,10 @@ const PropertiesPage = () => {
 
     return (
       <HandleLoading loading={loading}>
-        <div className="py-4 pr-4 md:pl-1.5 p-4 bg-white space-y-3">
-          <Header />
+        <div className="">
           <div className="og-bg og-p space-y-7">
             <div className="flex items-center gap-2">
-              <h1 className="lg:text-3xl font-semibold">Explore Properties</h1>
+              <h1 className="text-2xl lg:text-3xl font-semibold">Explore Properties</h1>
 
               <TooltipProvider>
                 <Tooltip>

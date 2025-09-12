@@ -1,8 +1,9 @@
-import React, { useState, useRef, useEffect } from "react";
+import React from "react";
 import { useAuth } from "../context/AuthContext";
 import { NavLink, useNavigate } from "react-router-dom";
 import { FaBars, FaTimes, FaTachometerAlt, FaBuilding, FaComments, FaCog, FaLayerGroup, FaUser } from "react-icons/fa";
 import { HiLogout } from "react-icons/hi";
+import HamburgerToggle from "./HamburgerToggle";
 
 const links = [
     { name: "Dashboard", path: "/dashboard", icon: <FaTachometerAlt /> },
@@ -13,62 +14,35 @@ const links = [
     { name: "Settings", path: "/settings", icon: <FaCog /> },
 ];
 
-const Sidebar = () => {
+const Sidebar = React.forwardRef(({ isOpen, setIsOpen }, ref) => {
     const { logout } = useAuth();
-    const [isOpen, setIsOpen] = useState(false);
-    const sidebarRef = useRef(null);
     const navigate = useNavigate();
     const handleLogout = () => {
         logout(); // perform logout
         navigate("/login"); // redirect to login
     };
 
-  // Close sidebar when clicking outside (mobile overlay)
-    useEffect(() => {
-        const handleClickOutside = (event) => {
-        if (sidebarRef.current && !sidebarRef.current.contains(event.target)) {
-            setIsOpen(false);
-        }
-        };
-
-        if (isOpen) {
-        document.addEventListener("mousedown", handleClickOutside);
-        } else {
-        document.removeEventListener("mousedown", handleClickOutside);
-        }
-
-        return () => {
-        document.removeEventListener("mousedown", handleClickOutside);
-        };
-    }, [isOpen]);
 
     return (
         <>
-        {/* Hamburger / Close Button */}
-        <button
-            className="fixed top-4 left-4 z-30 md:hidden p-2 bg-white rounded shadow"
-            onClick={() => setIsOpen(!isOpen)}
-        >
-            {isOpen ? <FaTimes size={20} /> : <FaBars size={20} />}
-        </button>
 
         {/* Mobile Overlay */}
         {isOpen && (
-            <div className="fixed inset-0 bg-black bg-opacity-25 z-31 md:hidden"></div>
+            <div className="fixed inset-0 bg-black/90 z-31 md:hidden"></div>
         )}
 
         {/* Sidebar */}
         <div
-            ref={sidebarRef}
+            ref={ref}
             className={`
-                fixed top-0 left-0 h-full bg-white z-40 transform py-4 pl-4 md:pr-1.5 p-4
+                fixed top-0 left-0  h-screen bg-white z-40 transform py-4 pl-4 md:pr-1.5 p-4
                 ${isOpen ? "translate-x-0" : "-translate-x-full"}
                 transition-transform duration-300 ease-in-out
-                md:translate-x-0 md:static 
-                lg:w-[200px] lg:translate-x-0
+                md:translate-x-0 
+                lg:w-[230px] lg:translate-x-0
             `}
         >
-            <div className="og-bg py-4  flex-col">
+            <div className="og-bg py-4 h-full flex-col">
                 <nav className=" flex-col w-full">
                     {links.map((link) => (
                     <NavLink
@@ -111,7 +85,7 @@ const Sidebar = () => {
         </div>
         </>
     );
-};
+});
 
 export default Sidebar;
 

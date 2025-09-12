@@ -5,8 +5,8 @@ const BioSection = ({ bio }) => {
   const [expanded, setExpanded] = useState(false);
 
   const words = bio?.split(" ") || [];
-  const isLong = words.length > 1;
-  const shortText = words.slice(0, 1).join(" ") + (isLong ? "..." : "");
+  const isLong = words.length > 50;
+  const shortText = words.slice(0, 50).join(" ") + (isLong ? "..." : "");
 
   return (
     <div className="w-full text-gray-700">

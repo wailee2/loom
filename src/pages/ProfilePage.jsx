@@ -34,10 +34,9 @@ const ProfilePage = () => {
 
   return (
     <HandleLoading loading={loading}>
-      <div className="py-4 pr-4 md:pl-1.5 p-4 space-y-3 bg-white min-h-screen">
-        <Header />
+      <div className=" ">
         <div className="og-bg og-p h-full flex flex-col gap-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             
             {/** profile pic and name */}
             <div className="col-span-1 bg-white p-4 rounded-xl shadow flex flex-col justify-around items-center gap-4">
@@ -53,7 +52,7 @@ const ProfilePage = () => {
             </div>
 
             {/** profile details */}
-            <div className="space-y-4 md:space-y-0 col-span-1 bg-white p-6 rounded-xl shadow  flex flex-col justify-between items-center">
+            <div className="space-y-4 md:space-y-0 col-span-1 lg:col-span-2 bg-white p-6 rounded-xl shadow  flex flex-col justify-between items-center">
               <div className="flex items-center w-full">
                 <div>
                   <h2 className="text-xl font-bold text-gray-800">Profile</h2>
