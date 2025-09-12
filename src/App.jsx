@@ -4,6 +4,7 @@ import { Routes, Route, Navigate } from "react-router-dom";
 import { BrowserRouter } from "react-router-dom";
 import { AuthProvider } from "./context/AuthContext";
 import { PropertyProvider } from "./context/PropertyContext";
+import { LandlordProvider } from "./context/LandlordContext";
 import AppRoutes from "./routes";
 
 const App = () => {
@@ -11,7 +12,9 @@ const App = () => {
     <AuthProvider>
       <PropertyProvider>
         <BrowserRouter>
-          <AppRoutes />
+          <LandlordProvider>
+            <AppRoutes />
+          </LandlordProvider>
         </BrowserRouter>
       </PropertyProvider>
     </AuthProvider>
