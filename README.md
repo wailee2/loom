@@ -28,7 +28,7 @@
 
 ## About
 
-**Loom** is the frontend I built as the Frontend Developer for **GreenGrass**, a real-estate property management platform. Loom is a responsive, component-based single-page app created with Vite, Tailwind CSS (v4), Shadcn UI and Framer Motion. It focuses on fast developer experience, accessible and reusable UI components, smooth interactions, and production deployment to Vercel.
+**Loom** is a responsive, component-based single-page app created with Vite, Tailwind CSS (v4), Shadcn UI and Framer Motion. It focuses on fast developer experience, accessible and reusable UI components, smooth interactions, and production deployment to Vercel.
 
 ## Demo
 
@@ -104,8 +104,6 @@ This frontend is designed to work with the GreenGrass Django backend. To integra
 Create a `.env` (or `.env.local`) file in the frontend directory with these variables:
 
 ```bash
-VITE_PUSHER_KEY=your_pusher_key
-VITE_PUSHER_CLUSTER=your_pusher_cluster
 VITE_API_URL=http://localhost:8000/api
 ```
 
