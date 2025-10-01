@@ -82,11 +82,11 @@ const ProfilePage = () => {
                 </div>
 
                 <div className="flex gap-2 py-0.5">
-                  <span className="flex items-center gap-3 text-gray-400 font-medium">
+                  <span className="flex items-center gap-3 text-gray-400">
                     <HiPhone className="text-xl" />
                     Phone
                   </span>
-                  <span className="text-gray-900 font-semibold">
+                  <span className="text-gray-900 font-semibold truncate max-w-[200px]">
                     {profile?.phone_number || "N/A"}
                   </span>
                 </div>
